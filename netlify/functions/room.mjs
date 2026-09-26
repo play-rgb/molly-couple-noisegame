@@ -64,6 +64,19 @@ export default async (req) => {
   } else if (body.op === "delete") {
     room.items = room.items.filter((i) => i.id !== body.id);
     if (room.pinned === body.id) room.pinned = room.items[0] ? room.items[0].id : null;
+  } else if (body.op === "favAdd" || body.op === "favRemove") {
+    const id = typeof body.id === "string" ? body.id.slice(0, 200) : "";
+    if (!id) return json({ error: "bad_item" }, 400);
+    const favs = Array.isArray(room.favs) ? room.favs : [];
+    if (body.op === "favAdd") {
+      if (!favs.includes(id)) {
+        if (favs.length >= 300) return json({ error: "too_many" }, 400);
+        favs.push(id);
+      }
+    } else {
+      room.favs = favs.filter((f) => f !== id);
+    }
+    if (body.op === "favAdd") room.favs = favs;
   } else if (body.op === "pin") {
     if (room.items.some((i) => i.id === body.id)) room.pinned = body.id;
   } else {
