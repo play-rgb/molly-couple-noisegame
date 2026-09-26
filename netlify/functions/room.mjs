@@ -11,8 +11,8 @@ const json = (data, status = 200) =>
     headers: { "content-type": "application/json", "cache-control": "no-store" },
   });
 
-function newCode() {
-  const bytes = crypto.getRandomValues(new Uint8Array(8));
+const CODE_RE = /^(?:[A-HJ-NP-Z2-9]{8}|[A-HJ-NP-Z2-9]{16})$/;
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
   return Array.from(bytes, (b) => ALPHABET[b % 32]).join("");
 }
 
