@@ -542,9 +542,16 @@ async function pullFavs(){ if(!CAVE) return;
     applyRoomFavs((await r.json()).room); setSync(''); }
   catch(e){ setSync('굴에 연결하지 못했어요. 이 기기에 저장된 카드를 보여 줘요.', true); } }
 async function pushFav(op,id){ saveLocalFavs(); if(!CAVE) return;
-  try{ const r=await fetch('/api/room',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({op,code:CAVE,id})});
-    if(!r.ok) throw new Error(r.status); applyRoomFavs((await r.json()).room); setSync(''); }
-  catch(e){ setSync('굴에 저장하지 못했어요. 인터넷 연결을 확인하고 다시 눌러 주세요.', true); } }
+  let r;
+  try{ r=await fetch('/api/room',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({op,code:CAVE,id})}); }
+  catch(e){ setSync('인터넷에 연결되지 않았어요. 연결을 확인하고 다시 눌러 주세요.', true); return; }
+  const j=await r.json().catch(()=>({}));
+  if(r.ok){ applyRoomFavs(j.room); setSync(''); return; }
+  if(j.error==='bad_op') setSync('서버 파일(room.mjs)이 예전 버전이라 즐겨찾기를 굴에 저장할 수 없어요.', true);
+  else if(j.error==='not_found') setSync('굴을 찾을 수 없어요. 몰리에서 굴 코드를 확인해 주세요.', true);
+  else if(j.error==='too_many') setSync('즐겨찾기는 300장까지 저장할 수 있어요.', true);
+  else if(r.status===404) setSync('서버 기능을 찾을 수 없어요. 배포 설정을 확인해 주세요.', true);
+  else setSync('굴에 저장하지 못했어요 (오류 '+r.status+'). 잠시 뒤 다시 눌러 주세요.', true); }
 
 /* browse */
 function pool(){ return CARDS.filter(c=> S.filter==='전체' || c.cat===S.filter); }
