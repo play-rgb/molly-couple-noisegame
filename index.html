@@ -158,6 +158,13 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent); outlin
 .ms-row b{font-family:"Black Han Sans",sans-serif; font-weight:400; font-size:1.3rem; min-width:4.6em}
 .ms-row .ms-date{flex:1; color:var(--muted)}
 .ms-row .ms-left{font-family:"Black Han Sans",sans-serif; color:var(--accent); white-space:nowrap}
+.mural{display:flex; align-items:center; gap:14px; margin:4px 0 24px; padding:18px 16px; border-radius:14px; text-decoration:none;
+  background:var(--hollow); color:var(--hollow-text); box-shadow:inset 0 0 0 1px rgba(224,164,88,.35), 0 0 0 4px var(--surface)}
+.mural-glyph{font-size:2rem; color:var(--ochre); line-height:1}
+.mural-body{flex:1; display:flex; flex-direction:column; gap:2px}
+.mural-body b{font-size:1.35rem}
+.mural-body span{font-size:1.05rem; color:var(--hollow-muted); line-height:1.45}
+.mural-go{font-size:2.2rem; color:var(--ochre); line-height:1}
 .note{margin-top:32px; font-size:1.05rem; color:var(--muted); text-align:center; line-height:1.6}
 </style>
 </head>
@@ -170,6 +177,12 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent); outlin
 
   <section class="hero" id="hero" aria-live="polite"></section>
   <p class="status" id="status"></p>
+
+  <a class="mural" href="/lovecard.html">
+    <span class="mural-glyph" aria-hidden="true">✦</span>
+    <span class="mural-body"><b>타로 러브카드</b><span>카드를 뽑고, 마음에 닿는 카드는 둘이 함께 모아요</span></span>
+    <span class="mural-go" aria-hidden="true">›</span>
+  </a>
 
   <!-- 연결 전 -->
   <section class="pair hidden" id="pairView">
