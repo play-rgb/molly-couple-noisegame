@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>몰리 — 희망까지 남은 날</title>
+<meta name="theme-color" content="#0F1D18">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="몰리">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<link rel="icon" href="/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --forest:#0F1D18; --moss:#1B2E27; --fog:#8E9B94; --bone:#E6E1D2;
+  --glow:#D4F2E4; --amber:#C8782E; --line:rgba(230,225,210,.14);
+  --bg:var(--forest); --surface:var(--moss); --text:var(--bone); --muted:var(--fog);
+  --accent:var(--amber); --halo:rgba(212,242,228,.22);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#E4E3DA; --surface:#D6D7CC; --text:#16241E; --muted:#4E5D55;
+    --accent:#A45A1B; --line:rgba(22,36,30,.16); --halo:rgba(120,170,150,.35);
+  }
+}
+:root[data-theme="light"]{
+  --bg:#E4E3DA; --surface:#D6D7CC; --text:#16241E; --muted:#4E5D55;
+  --accent:#A45A1B; --line:rgba(22,36,30,.16); --halo:rgba(120,170,150,.35);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px); -webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Gowun Batang","Noto Serif KR","Apple SD Gothic Neo",serif;
+  font-size:20px; line-height:1.6; -webkit-font-smoothing:antialiased; word-break:keep-all;
+}
+.wrap{max-width:560px; margin:0 auto; padding:22px 16px 56px}
+header{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:4px}
+.brand{font-family:"Black Han Sans",sans-serif; font-size:2.1rem; line-height:1.1}
+.brand small{display:block; font-family:"Gowun Batang",serif; font-size:1.05rem; color:var(--muted); margin-top:4px}
+.theme-btn{background:none; border:1px solid var(--line); color:var(--text); border-radius:999px; padding:8px 16px; font:inherit; font-size:1.05rem; cursor:pointer; white-space:nowrap}
+
+/* hero */
+.hero{position:relative; padding:34px 0 34px; text-align:center; overflow:hidden}
+.hero::before{
+  content:""; position:absolute; left:50%; top:46%; width:360px; height:360px;
+  transform:translate(-50%,-50%); border-radius:50%;
+  background:radial-gradient(circle, var(--halo) 0%, transparent 65%);
+  animation:breathe 7s ease-in-out infinite; pointer-events:none;
+}
+@keyframes breathe{0%,100%{opacity:.55; transform:translate(-50%,-50%) scale(.92)}50%{opacity:1; transform:translate(-50%,-50%) scale(1.06)}}
+@media (prefers-reduced-motion: reduce){.hero::before{animation:none}}
+.hero-title{position:relative; font-size:1.45rem; font-weight:700; margin:0 0 4px; overflow-wrap:anywhere}
+.count{position:relative; font-family:"Black Han Sans",sans-serif; line-height:.95; margin:0; white-space:nowrap}
+.count .sign{font-size:15vw; color:var(--accent); vertical-align:top; margin-right:2px}
+.count .num{font-size:36vw; letter-spacing:-.02em}
+.count.len4 .num{font-size:28vw}
+.count.len5 .num{font-size:23vw}
+.count.len4 .sign,.count.len5 .sign{font-size:12vw}
+.count.day .num{font-size:24vw; color:var(--accent)}
+.count .unit{display:block; font-size:2.6rem; margin-top:6px}
+.hero-sub{position:relative; margin:16px 0 0; font-size:1.4rem; font-weight:700}
+.hero-date{position:relative; color:var(--muted); font-size:1.15rem; margin-top:2px}
+.empty{position:relative; padding:14px 0; font-size:1.2rem; color:var(--muted)}
+.empty strong{display:block; font-family:"Black Han Sans",sans-serif; font-weight:400; font-size:5rem; line-height:1.1; color:var(--text); margin-bottom:8px}
+@media (min-width:560px){
+  .count .sign{font-size:4.5rem} .count .num{font-size:11rem}
+  .count.len4 .num{font-size:9rem} .count.len5 .num{font-size:7.5rem}
+  .count.len4 .sign,.count.len5 .sign{font-size:3.5rem}
+  .count.day .num{font-size:7.5rem}
+}
+
+/* form */
+.add{border-top:1px solid var(--line); padding-top:24px; margin-top:4px}
+.add h2,.list h2{font-size:1.5rem; font-weight:700; margin:0 0 16px}
+.field{display:flex; flex-direction:column; gap:6px; margin-bottom:16px}
+.field label{font-size:1.15rem; color:var(--muted)}
+input[type=text],input[type=date]{
+  font:inherit; font-size:1.25rem; color:var(--text); background:var(--surface);
+  border:1px solid var(--line); border-radius:8px; padding:14px; width:100%; min-height:56px;
+  color-scheme:dark light;
+}
+.row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+.check{display:flex; gap:12px; align-items:flex-start; font-size:1.15rem; cursor:pointer; line-height:1.45}
+.check input{accent-color:var(--accent); width:26px; height:26px; flex:none; margin:1px 0 0}
+.primary{
+  font:inherit; font-size:1.4rem; font-weight:700; background:var(--accent); color:#fff; border:none;
+  border-radius:8px; padding:16px 20px; cursor:pointer; margin-top:18px; width:100%;
+}
+.err{color:var(--accent); font-size:1.15rem; font-weight:700; min-height:1.3em; margin:10px 0 0}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+
+/* list */
+.list{border-top:1px solid var(--line); padding-top:24px; margin-top:22px}
+.item{display:grid; grid-template-columns:1fr; gap:6px; padding:18px 0; border-bottom:1px solid var(--line)}
+.item.pinned .it-title::after{content:"대표"; font-size:.95rem; color:var(--accent); border:1px solid var(--accent); border-radius:5px; padding:0 7px; margin-left:10px; vertical-align:middle}
+.it-count{font-family:"Black Han Sans",sans-serif; font-size:2.6rem; line-height:1.05}
+.it-count small{font-family:"Black Han Sans",sans-serif; font-size:1.5rem; margin-left:4px; color:var(--muted)}
+.it-title{font-size:1.35rem; font-weight:700; overflow-wrap:anywhere}
+.it-date{font-size:1.1rem; color:var(--muted)}
+.it-actions{display:flex; gap:10px; margin-top:6px}
+.ghost{background:none; border:1px solid var(--line); color:var(--text); font:inherit; font-size:1.1rem; border-radius:8px; padding:10px 18px; cursor:pointer; min-height:48px}
+
+
+.hidden{display:none !important}
+.status{font-size:1rem; color:var(--muted); text-align:center; margin:0 0 6px; min-height:1.4em}
+.status.bad{color:var(--accent); font-weight:700}
+/* pairing */
+.pair{border-top:1px solid var(--line); padding-top:24px}
+.pair h2{font-size:1.5rem; margin:0 0 8px}
+.pair p{font-size:1.15rem; color:var(--muted); margin:0 0 18px}
+.or{text-align:center; color:var(--muted); font-size:1.1rem; margin:22px 0 14px}
+.code-input{text-transform:uppercase; letter-spacing:.12em; font-family:"Black Han Sans",sans-serif !important; font-size:1.7rem !important; text-align:center}
+.secondary{font:inherit; font-size:1.3rem; font-weight:700; background:none; color:var(--text); border:2px solid var(--text); border-radius:8px; padding:14px 20px; cursor:pointer; width:100%; margin-top:12px}
+/* couple box */
+.couple{border-top:1px solid var(--line); margin-top:22px; padding-top:24px; text-align:center}
+.couple h2{font-size:1.3rem; margin:0 0 4px}
+.couple .code{font-family:"Black Han Sans",sans-serif; font-size:2.6rem; letter-spacing:.06em; margin:4px 0 6px; user-select:all}
+.couple p{font-size:1.1rem; color:var(--muted); margin:0 0 14px}
+.couple .btns{display:flex; flex-direction:column; gap:10px}
+.hero-next{position:relative; margin:12px auto 0; max-width:22em; font-size:1.2rem; font-weight:700; color:var(--accent)}
+.ms{margin-top:8px; border-left:3px solid var(--accent); padding:2px 0 2px 12px}
+.ms-head{font-size:1rem; color:var(--muted); margin-bottom:2px}
+.ms-row{display:flex; align-items:baseline; gap:10px; font-size:1.15rem; padding:3px 0}
+.ms-row b{font-family:"Black Han Sans",sans-serif; font-weight:400; font-size:1.3rem; min-width:4.6em}
+.ms-row .ms-date{flex:1; color:var(--muted)}
+.ms-row .ms-left{font-family:"Black Han Sans",sans-serif; color:var(--accent); white-space:nowrap}
+.note{margin-top:32px; font-size:1.05rem; color:var(--muted); text-align:center; line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">몰리<small>희망까지 남은 날</small></div>
+    <button class="theme-btn" id="themeBtn" type="button">밝게</button>
+  </header>
+
+  <section class="hero" id="hero" aria-live="polite"></section>
+  <p class="status" id="status"></p>
+
+  <!-- 연결 전 -->
+  <section class="pair hidden" id="pairView">
+    <h2>둘이 함께 세기</h2>
+    <p>한 사람이 공간을 만들고, 나온 커플 코드를 상대에게 보내 주세요.</p>
+    <button class="primary" id="createBtn" type="button">새 커플 공간 만들기</button>
+    <div class="or">코드를 받았다면</div>
+    <div class="field">
+      <label for="codeIn">커플 코드 8자리</label>
+      <input type="text" id="codeIn" class="code-input" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD-2345">
+    </div>
+    <button class="secondary" id="joinBtn" type="button">연결하기</button>
+    <p class="err" id="pairErr"></p>
+  </section>
+
+  <!-- 연결 후 -->
+  <div id="mainView" class="hidden">
+    <section class="add">
+      <h2>새 날짜 세기</h2>
+      <div class="field">
+        <label for="title">무엇을 기다리나요</label>
+        <input type="text" id="title" maxlength="40" placeholder="예: 100일">
+      </div>
+      <div class="field">
+        <label for="date">날짜</label>
+        <input type="date" id="date">
+      </div>
+      <div class="row" style="flex-direction:column; align-items:stretch; gap:14px">
+        <label class="check"><input type="checkbox" id="auto"> 기념일 자동 계산 (100몰리마다, 매년 주년)</label>
+        <label class="check"><input type="checkbox" id="startOne"> 지난 날짜는 첫날을 1몰리로 세기</label>
+      </div>
+      <button class="primary" id="addBtn" type="button">몰리 세기 시작</button>
+      <p class="err" id="err"></p>
+    </section>
+
+    <section class="list hidden" id="listWrap">
+      <h2>함께 세는 날들</h2>
+      <div id="list"></div>
+    </section>
+
+    <section class="couple">
+      <h2>우리 커플 코드</h2>
+      <div class="code" id="codeShow"></div>
+      <p>상대 기기에서 이 코드를 입력하거나 링크를 열면 연결돼요.</p>
+      <div class="btns">
+        <button class="secondary" id="shareBtn" type="button">연결 링크 보내기</button>
+        <button class="ghost" id="leaveBtn" type="button">이 기기에서 연결 끊기</button>
+      </div>
+    </section>
+  </div>
+
+  <p class="note">1몰리 = 하루. 커플 코드를 아는 사람은 누구나 기록을 볼 수 있으니 둘만 간직하세요.</p>
+</div>
+
+<script>
+(function(){
+  var LS_CODE = "molly-code", LS_CACHE = "molly-cache", LS_OLD = "molly-dday-v1", LS_THEME = "molly-theme";
+  var CODE_RE = /^[A-HJ-NP-Z2-9]{8}$/;
+  var code = null, state = { items: [], pinned: null }, busy = false;
+  var $ = function(id){ return document.getElementById(id); };
+
+  function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function lsSet(k,v){ try{ if(v===null) localStorage.removeItem(k); else localStorage.setItem(k,v); }catch(e){} }
+
+  function normCode(s){ return String(s||"").toUpperCase().replace(/[^A-Z0-9]/g,""); }
+  function showCode(c){ return c.slice(0,4)+"-"+c.slice(4); }
+
+  function setStatus(t, bad){ var s=$("status"); s.textContent=t||""; s.className="status"+(bad?" bad":""); }
+
+  /* ---------- 날짜 ---------- */
+  function today(){ var d=new Date(); return new Date(d.getFullYear(),d.getMonth(),d.getDate()); }
+  function parse(s){ var p=s.split("-"); return new Date(+p[0],+p[1]-1,+p[2]); }
+  function diff(i){ return Math.round((parse(i.date)-today())/86400000); }
+  function fmtDate(s){ var d=parse(s); return d.getFullYear()+"년 "+(d.getMonth()+1)+"월 "+d.getDate()+"일 ("+"일월화수목금토"[d.getDay()]+")"; }
+  function info(i){
+    var n=diff(i);
+    if(n>0) return {sign:"D-",num:n,line:"희망까지 "+n+"몰리 남았어요"};
+    if(n===0) return {sign:"",num:"D-DAY",line:"오늘이 바로 그날이에요",day:true};
+    var past=-n+(i.startOne?1:0);
+    return {sign:"D+",num:past,line:past+"몰리째 흐르는 중이에요"};
+  }
+  function addDays(d,n){ return new Date(d.getFullYear(),d.getMonth(),d.getDate()+n); }
+  function addYears(d,y){
+    var t=new Date(d.getFullYear()+y,d.getMonth(),d.getDate());
+    if(t.getMonth()!==d.getMonth()) t=new Date(d.getFullYear()+y,d.getMonth()+1,0); // 2월 29일 → 2월 28일
+    return t;
+  }
+  function fmtD(d){ return d.getFullYear()+"년 "+(d.getMonth()+1)+"월 "+d.getDate()+"일 ("+"일월화수목금토"[d.getDay()]+")"; }
+  function milestones(item, count){
+    var s=parse(item.date), k=item.startOne?1:0, t=today(), list=[], n, y, d;
+    for(n=100, y=0; n<=36500 && y<count; n+=100){ d=addDays(s,n-k); if(d>=t){ list.push({label:n+"몰리",date:d}); y++; } }
+    for(y=1, n=0; y<=100 && n<count; y++){ d=addYears(s,y); if(d>=t){ list.push({label:y+"주년",date:d}); n++; } }
+    list.sort(function(a,b){ return a.date-b.date; });
+    var out=[];
+    list.forEach(function(m){
+      var last=out[out.length-1];
+      if(last && +last.date===+m.date) last.label+=" "+m.label; else out.push(m);
+    });
+    return out.slice(0,count).map(function(m){ m.left=Math.round((m.date-t)/86400000); return m; });
+  }
+  function esc(s){ var d=document.createElement("div"); d.textContent=s; return d.innerHTML; }
+
+  /* ---------- 서버 ---------- */
+  function why(e){
+    if(!e || e.status===undefined) return "인터넷에 연결되지 않았어요. 연결을 확인하고 다시 눌러 주세요.";
+    if(e.status===404 && !e.code) return "서버 기능을 찾을 수 없어요. 배포 설정을 확인해 주세요.";
+    return "서버에서 저장하지 못했어요 (오류 "+e.status+"). 잠시 뒤 다시 눌러 주세요.";
+  }
+  async function api(body){
+    var r;
+    try{ r = await fetch("/api/room",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); }
+    catch(n){ throw new Error("network"); }
+    var j = await r.json().catch(function(){ return {}; });
+    if(!r.ok){ var e=new Error(j.error||"error"); e.status=r.status; e.code=j.error; throw e; }
+    return j;
+  }
+  function apply(room){
+    state = { items: room.items||[], pinned: room.pinned||null };
+    lsSet(LS_CACHE, JSON.stringify(state));
+    render();
+  }
+  async function pull(quiet){
+    if(!code) return;
+    try{
+      var r = await fetch("/api/room?code="+code,{cache:"no-store"});
+      if(r.status===404 && (r.headers.get("content-type")||"").indexOf("json")<0){ setStatus("서버 기능을 찾을 수 없어요. 배포 설정을 확인해 주세요.", true); return; }
+      if(r.status===404){ disconnect("이 커플 코드를 찾을 수 없어요. 코드를 다시 확인해 주세요."); return; }
+      if(!r.ok) throw new Error("http");
+      var j = await r.json();
+      apply(j.room);
+      setStatus("");
+    }catch(e){
+      if(!quiet) setStatus("인터넷 연결을 확인해 주세요. 마지막으로 받은 기록을 보여 주고 있어요.", true);
+    }
+  }
+  async function run(body){
+    if(busy) return; busy=true; setStatus("저장하는 중…");
+    try{ var j=await api(Object.assign({code:code},body)); apply(j.room); setStatus("저장했어요"); setTimeout(function(){ if($("status").textContent==="저장했어요") setStatus(""); },1500); }
+    catch(e){
+      if(e.status===404 && e.code==="not_found") disconnect("이 커플 코드를 찾을 수 없어요.");
+      else if(e.code==="too_many") setStatus("날짜는 100개까지 셀 수 있어요. 지난 날을 지워 주세요.", true);
+      else setStatus(why(e), true);
+    }
+    busy=false;
+  }
+
+  /* ---------- 화면 ---------- */
+  function pinnedItem(){
+    var p=state.items.filter(function(i){ return i.id===state.pinned; })[0];
+    if(p) return p;
+    var up=state.items.filter(function(i){ return diff(i)>=0; }).sort(function(a,b){ return diff(a)-diff(b); });
+    return up[0]||state.items[0]||null;
+  }
+  function renderHero(){
+    var hero=$("hero"), p=pinnedItem();
+    if(!code){ hero.innerHTML='<div class="empty"><strong>0몰리</strong>두 사람의 기기를 연결하면 같은 날을 함께 셀 수 있어요.</div>'; return; }
+    if(!p){ hero.innerHTML='<div class="empty"><strong>0몰리</strong>기다리는 날을 아래에 적으면 둘 다 여기서 세기 시작해요.</div>'; return; }
+    var f=info(p), len=String(f.num).length;
+    var cls=f.day?" day":(len>=5?" len5":len===4?" len4":"");
+    hero.innerHTML='<p class="hero-title">'+esc(p.title)+'</p>'+
+      '<p class="count'+cls+'">'+(f.sign?'<span class="sign">'+f.sign+'</span>':'')+'<span class="num">'+f.num+'</span>'+(f.day?'':'<span class="unit">몰리</span>')+'</p>'+
+      '<p class="hero-sub">'+f.line+'</p><p class="hero-date">'+fmtDate(p.date)+'</p>'+heroNext(p);
+  }
+  function heroNext(p){
+    if(!p.auto) return "";
+    var m=milestones(p,1)[0]; if(!m) return "";
+    if(m.left===0) return '<p class="hero-next">오늘은 '+esc(m.label)+' 기념일이에요</p>';
+    return '<p class="hero-next">다음 기념일 '+esc(m.label)+'까지 '+m.left+'몰리 남았어요</p>';
+  }
+  function renderList(){
+    $("listWrap").classList.toggle("hidden", state.items.length===0);
+    var p=pinnedItem();
+    var sorted=state.items.slice().sort(function(a,b){
+      var da=diff(a), db=diff(b);
+      if((da>=0)!==(db>=0)) return da>=0?-1:1;
+      return da>=0?da-db:db-da;
+    });
+    $("list").innerHTML=sorted.map(function(i){
+      var f=info(i), isPin=p&&p.id===i.id;
+      var c=f.day?"D-DAY":f.sign+f.num+"<small>몰리</small>";
+      return '<div class="item'+(isPin?" pinned":"")+'"><div class="it-count">'+c+'</div>'+
+        '<div class="it-body"><div class="it-title">'+esc(i.title)+'</div><div class="it-date">'+fmtDate(i.date)+'</div>'+msBlock(i)+'</div>'+
+        '<div class="it-actions">'+(isPin?"":'<button class="ghost" data-pin="'+i.id+'" type="button">대표로</button>')+
+        '<button class="ghost" data-del="'+i.id+'" type="button" aria-label="'+esc(i.title)+' 삭제">삭제</button></div></div>';
+    }).join("");
+  }
+  function msBlock(i){
+    if(!i.auto) return "";
+    var ms=milestones(i,3); if(!ms.length) return "";
+    return '<div class="ms"><div class="ms-head">다가오는 기념일</div>'+ms.map(function(m){
+      return '<div class="ms-row"><b>'+esc(m.label)+'</b><span class="ms-date">'+(m.date.getFullYear()===today().getFullYear()?fmtD(m.date).replace(/^\d+년 /,""):fmtD(m.date).replace(/^\d\d(\d\d)년 /,"'$1년 "))+'</span><span class="ms-left">'+(m.left===0?"오늘":"D-"+m.left)+'</span></div>';
+    }).join("")+'</div>';
+  }
+  function render(){
+    $("pairView").classList.toggle("hidden", !!code);
+    $("mainView").classList.toggle("hidden", !code);
+    if(code) $("codeShow").textContent=showCode(code);
+    renderHero(); renderList();
+  }
+
+  function connect(c){
+    code=c; lsSet(LS_CODE,c);
+    var cached=lsGet(LS_CACHE); if(cached){ try{ state=JSON.parse(cached); }catch(e){} }
+    render(); pull();
+  }
+  function disconnect(msg){
+    code=null; state={items:[],pinned:null};
+    lsSet(LS_CODE,null); lsSet(LS_CACHE,null);
+    render(); setStatus(""); $("pairErr").textContent=msg||"";
+  }
+
+  /* ---------- 이벤트 ---------- */
+  $("createBtn").addEventListener("click", async function(){
+    var b=this; b.disabled=true; $("pairErr").textContent=""; setStatus("공간을 만드는 중…");
+    var old=[]; try{ var o=JSON.parse(lsGet(LS_OLD)||"null"); if(o&&Array.isArray(o.items)) old=o.items; }catch(e){}
+    try{ var j=await api({op:"create",items:old}); lsSet(LS_OLD,null); connect(j.code); apply(j.room); setStatus("공간을 만들었어요. 아래 커플 코드를 상대에게 보내 주세요."); }
+    catch(e){ setStatus(""); $("pairErr").textContent="공간을 만들지 못했어요. "+why(e); }
+    b.disabled=false;
+  });
+  $("joinBtn").addEventListener("click", async function(){
+    var c=normCode($("codeIn").value);
+    if(!CODE_RE.test(c)){ $("pairErr").textContent="코드 8자리를 정확히 입력해 주세요."; return; }
+    $("pairErr").textContent=""; connect(c);
+  });
+  $("codeIn").addEventListener("input", function(){
+    var c=normCode(this.value).slice(0,8);
+    this.value = c.length>4 ? c.slice(0,4)+"-"+c.slice(4) : c;
+  });
+  $("addBtn").addEventListener("click", function(){
+    var t=$("title"), d=$("date"), err=$("err"), title=t.value.trim(), date=d.value;
+    if(!title){ err.textContent="기다리는 일을 적어 주세요."; t.focus(); return; }
+    if(!date){ err.textContent="날짜를 골라 주세요."; d.focus(); return; }
+    err.textContent="";
+    run({op:"add",item:{title:title,date:date,startOne:$("startOne").checked,auto:$("auto").checked}}).then(function(){
+      t.value=""; d.value=""; $("startOne").checked=false; $("auto").checked=false;
+    });
+  });
+  $("auto").addEventListener("change", function(){ if(this.checked) $("startOne").checked=true; });
+  $("list").addEventListener("click", function(e){
+    var b=e.target.closest("button"); if(!b) return;
+    if(b.dataset.pin) run({op:"pin",id:b.dataset.pin});
+    if(b.dataset.del && confirm("이 날짜를 지울까요? 상대 기기에서도 사라져요.")) run({op:"delete",id:b.dataset.del});
+  });
+  $("shareBtn").addEventListener("click", async function(){
+    var url=location.origin+"/?code="+code;
+    var text="몰리에서 같이 날짜 세자! 커플 코드: "+showCode(code);
+    try{
+      if(navigator.share){ await navigator.share({title:"몰리",text:text,url:url}); return; }
+      await navigator.clipboard.writeText(text+"\n"+url); setStatus("링크를 복사했어요. 상대에게 붙여 넣어 보내 주세요.");
+    }catch(e){ if(e && e.name!=="AbortError") setStatus("복사하지 못했어요. 위의 코드를 직접 알려 주세요.", true); }
+  });
+  $("leaveBtn").addEventListener("click", function(){
+    if(confirm("이 기기에서만 연결을 끊어요. 기록은 지워지지 않고, 코드를 다시 입력하면 돌아올 수 있어요.")) disconnect("");
+  });
+
+  /* ---------- 테마 ---------- */
+  var root=document.documentElement, tb=$("themeBtn");
+  function isDark(){ var t=root.getAttribute("data-theme"); return t? t==="dark" : !matchMedia("(prefers-color-scheme: light)").matches; }
+  function syncTheme(){ tb.textContent=isDark()?"밝게":"어둡게"; }
+  var th=lsGet(LS_THEME); if(th) root.setAttribute("data-theme",th);
+  tb.addEventListener("click", function(){ var n=isDark()?"light":"dark"; root.setAttribute("data-theme",n); lsSet(LS_THEME,n); syncTheme(); });
+  syncTheme();
+
+  /* ---------- 시작 ---------- */
+  var q=normCode(new URLSearchParams(location.search).get("code"));
+  if(q){ history.replaceState(null,"",location.pathname); }
+  if(q && CODE_RE.test(q)) connect(q);
+  else { var saved=lsGet(LS_CODE); if(saved && CODE_RE.test(saved)) connect(saved); else render(); }
+
+  setInterval(function(){ if(!document.hidden) pull(true); }, 15000);
+  document.addEventListener("visibilitychange", function(){ if(!document.hidden) pull(true); });
+  setInterval(renderHero, 60000);
+})();
+</script>
+</body>
+</html>
