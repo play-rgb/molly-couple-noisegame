@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#071013">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<title>타로 러브카드 · Tarot LoveCard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital@0;1&family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Serif+SC:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --night:#151033; --night-2:#241C4A;
+    --gold:#E0BC63; --gold-2:#F3E0A6; --gold-deep:#9A7524; --gold-line:#B99236;
+    --parch:#F7EDD4; --parch-2:#ECDCB2;
+    --ink:#332310;     /* primary body text on parchment (high contrast) */
+    --ink-2:#6A5228;   /* secondary body text (readable brown) */
+    --ok:#3C8A6A; --no:#B0574F;
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; height:100%; }
+  body{ font-family:'Cormorant Garamond',serif; color:var(--gold-2); min-height:100dvh;
+    display:flex; flex-direction:column; align-items:center; padding:calc(14px + env(safe-area-inset-top,0px)) 14px calc(40px + env(safe-area-inset-bottom,0px));
+    background:
+      radial-gradient(2px 2px at 15% 18%, rgba(243,224,166,.6), transparent),
+      radial-gradient(1.5px 1.5px at 80% 12%, rgba(243,224,166,.5), transparent),
+      radial-gradient(1.5px 1.5px at 30% 78%, rgba(243,224,166,.4), transparent),
+      radial-gradient(2px 2px at 88% 68%, rgba(243,224,166,.4), transparent),
+      radial-gradient(1.5px 1.5px at 55% 40%, rgba(243,224,166,.35), transparent),
+      radial-gradient(135% 100% at 50% -5%, #322A5C 0%, #1B1540 45%, var(--night) 100%);
+    background-attachment:fixed; }
+
+  header{ text-align:center; margin:2px 0 12px; }
+  .brand{ font-family:'Nanum Myeongjo',serif; font-weight:800; font-size:clamp(23px,6.4vw,27px); letter-spacing:2px; color:var(--gold-2); text-shadow:0 1px 0 var(--gold-deep), 0 0 16px rgba(224,188,99,.3); }
+  .brand .em{ color:var(--gold); }
+  .sub{ margin-top:4px; font-family:'Cinzel',serif; font-size:9.5px; letter-spacing:2.5px; color:var(--gold); opacity:.85; text-transform:uppercase; }
+
+  .modebar{ display:inline-flex; gap:8px; margin:4px 0 14px; }
+  .modebar button{ cursor:pointer; font-family:'Cinzel',serif; font-size:12px; letter-spacing:2px; text-transform:uppercase; padding:9px 22px; border:1px solid var(--gold-line); background:rgba(36,28,74,.6); color:var(--gold-2); border-radius:3px; transition:.2s; }
+  .modebar button[aria-pressed="true"]{ background:linear-gradient(180deg,var(--gold-2),var(--gold)); color:#2a2008; border-color:var(--gold-2); box-shadow:0 0 14px rgba(224,188,99,.45); }
+
+  .lang-wrap{ text-align:center; margin:2px 0 14px; }
+  .lang-label{ font-family:'Cinzel',serif; font-size:11px; letter-spacing:2px; color:var(--gold-2); opacity:.9; margin-bottom:8px; }
+  .segment{ display:inline-flex; gap:6px; }
+  .segment button{ border:1px solid var(--gold-line); background:rgba(36,28,74,.65); cursor:pointer; padding:8px 16px; font-family:'Cinzel',serif; font-size:12px; letter-spacing:1px; color:var(--gold-2); transition:.2s; border-radius:3px; }
+  .segment button[aria-pressed="true"]{ background:linear-gradient(180deg,var(--gold-2),var(--gold)); color:#2a2008; border-color:var(--gold-2); box-shadow:0 0 12px rgba(224,188,99,.45); }
+
+  /* card / deck */
+  .stage{ perspective:1400px; }
+  .deck{ position:relative; width:min(300px,88vw); margin:0 auto; }
+  .deck::before,.deck::after{ content:""; position:absolute; inset:0; border-radius:16px;
+    background:repeating-linear-gradient(45deg, rgba(224,188,99,.07) 0 6px, transparent 6px 12px), radial-gradient(circle at 50% 50%, #2d2560, #191340);
+    border:2px solid var(--gold-line); box-shadow:0 14px 30px rgba(0,0,0,.5), inset 0 0 0 5px rgba(224,188,99,.12); }
+  .deck::before{ transform:translate(10px,11px) rotate(3.5deg); }
+  .deck::after{ transform:translate(5px,5px) rotate(-2.2deg); }
+  .panel, .card{ background:radial-gradient(120% 90% at 50% 0%, #FCF4DE, var(--parch) 55%, var(--parch-2) 100%);
+    border:2px solid var(--gold-line); border-radius:16px; box-shadow:0 16px 34px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.5); }
+  .card{ position:relative; z-index:3; width:100%; padding:12px 13px 14px; display:flex; flex-direction:column; cursor:pointer; user-select:none; overflow:hidden; transition:transform .17s ease, box-shadow .25s; transform-style:preserve-3d; }
+  .card.flip{ transform:rotateY(90deg) scale(.97); }
+  .card:active{ transform:translateY(2px) scale(.996); }
+  .card::before{ content:""; position:absolute; inset:8px; border-radius:10px; border:1.5px solid var(--gold-line); box-shadow:inset 0 0 0 3px rgba(224,188,99,.22); pointer-events:none; }
+  .card > *{ position:relative; z-index:1; }
+  .card-top{ display:flex; align-items:center; justify-content:space-between; padding:2px 6px 0; }
+  .suit{ font-size:17px; color:var(--gold-deep); width:22px; text-align:center; }
+  .numeral{ font-family:'Cinzel',serif; font-weight:700; font-size:14px; letter-spacing:2px; color:var(--ink); }
+  .numeral::before,.numeral::after{ content:"·"; color:var(--gold-deep); margin:0 5px; }
+
+  .art-frame{ margin:8px auto 6px; width:clamp(150px,46vw,178px); aspect-ratio:1 / 1.03; border:2px solid var(--gold-line); border-radius:50% 50% 10px 10px / 46% 46% 8px 8px;
+    background:radial-gradient(120% 100% at 50% 20%, #FFFCF0, #F1E3BC); box-shadow:inset 0 0 0 3px rgba(224,188,99,.28), inset 0 6px 16px rgba(154,117,36,.14);
+    display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .art-frame.sm{ width:clamp(120px,38vw,146px); }
+  .art{ width:72%; height:72%; }
+  .back-q{ font-family:'Cinzel',serif; font-size:clamp(38px,11vw,46px); color:var(--gold-deep); }
+  .art .s{ fill:none; stroke:var(--gold-deep); stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; }
+  .art .s2{ fill:none; stroke:var(--gold-deep); stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; opacity:.92; }
+  .art .fill{ fill:var(--gold-deep); stroke:none; }
+
+  .orig{ text-align:center; font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(12px,3.4vw,13px); color:var(--ink-2); margin:1px 6px 0; line-height:1.25; }
+  .arcana{ text-align:center; font-family:'Cinzel',serif; font-size:clamp(9.5px,2.7vw,10.5px); letter-spacing:2px; color:var(--ink-2); text-transform:uppercase; margin:4px 0 3px; }
+  .arcana .kcat{ color:var(--ink); font-weight:700; }
+  .lines{ flex:1; display:flex; flex-direction:column; justify-content:center; gap:2px; padding:0 4px; }
+  .line{ text-align:center; padding:1px 2px; }
+  .line .txt{ line-height:1.16; word-break:keep-all; color:var(--ink); }
+  .lang-ko .txt{ font-family:'Nanum Myeongjo',serif; font-weight:800; }
+  .lang-zh .txt{ font-family:'Noto Serif SC',serif; font-weight:700; }
+  .lang-en .txt{ font-family:'Cinzel',serif; font-weight:700; letter-spacing:.3px; text-transform:uppercase; }
+  .line.primary .txt{ font-size:clamp(18px,5.4vw,22px); }
+  .line.primary.lang-en .txt{ font-size:clamp(15px,4.4vw,17px); }
+  .lines.lit .line.primary .txt{ font-size:clamp(14px,4.2vw,16px); }
+  .lines.lit .line.primary.lang-en .txt{ font-size:clamp(12.5px,3.6vw,14px); }
+  .line.secondary .txt{ font-size:clamp(12.5px,3.6vw,14px); color:var(--ink-2); }
+  .line.secondary.lang-en .txt{ font-size:clamp(11.5px,3.2vw,12.5px); }
+  .lines.lit .line.secondary .txt{ font-size:clamp(11.5px,3.2vw,12.5px); }
+  .pron{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(11.5px,3.2vw,12.5px); color:var(--ink-2); }
+  .line.primary .pron{ display:none; }
+  .credit{ text-align:center; font-family:'Cinzel',serif; font-size:clamp(9px,2.6vw,10px); letter-spacing:1.2px; color:var(--ink-2); text-transform:uppercase; margin-top:5px; }
+  .fav{ position:absolute; z-index:4; right:13px; bottom:11px; width:34px; height:34px; border-radius:50%; cursor:pointer; border:1.5px solid var(--gold-line); background:rgba(255,252,240,.9); color:var(--gold-deep); font-size:16px; display:flex; align-items:center; justify-content:center; transition:transform .15s; }
+  .fav:active{ transform:scale(.85); }
+  .fav.on{ background:linear-gradient(180deg,var(--gold-2),var(--gold)); color:#3a2a08; }
+
+  .draw{ margin-top:20px; cursor:pointer; font-family:'Cinzel',serif; font-size:15px; letter-spacing:3px; text-transform:uppercase; color:#2a2008; padding:14px 32px; border:0; border-radius:4px; background:linear-gradient(180deg,var(--gold-2),var(--gold)); box-shadow:0 5px 0 var(--gold-deep), 0 10px 22px rgba(224,188,99,.32); transition:.1s; }
+  .draw:active{ transform:translateY(4px); box-shadow:0 1px 0 var(--gold-deep); }
+  .cats{ display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin:22px 0 4px; max-width:380px; }
+  .cats button{ cursor:pointer; font-family:'Cinzel',serif; font-size:11px; letter-spacing:.5px; padding:8px 12px; border-radius:3px; color:var(--gold-2); background:rgba(36,28,74,.6); border:1px solid var(--gold-line); transition:.15s; }
+  .cats button .g{ margin-right:5px; opacity:.9; }
+  .cats button[aria-pressed="true"]{ background:linear-gradient(180deg,var(--gold-2),var(--gold)); color:#2a2008; border-color:var(--gold-2); box-shadow:0 0 12px rgba(224,188,99,.4); }
+  .tray{ margin-top:26px; width:100%; max-width:360px; }
+  .tray h2{ font-family:'Cinzel',serif; font-size:12px; letter-spacing:2px; color:var(--gold-2); text-transform:uppercase; display:flex; align-items:center; justify-content:center; gap:8px; margin:0 0 12px; }
+  .tray h2::before,.tray h2::after{ content:""; flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--gold-line)); }
+  .tray h2::after{ background:linear-gradient(90deg,var(--gold-line),transparent); }
+  .empty{ font-style:italic; font-size:14px; color:var(--gold-2); opacity:.7; text-align:center; border:1px dashed var(--gold-line); border-radius:8px; padding:16px; }
+  .fav-item{ display:flex; align-items:center; gap:10px; cursor:pointer; background:rgba(36,28,74,.6); border:1px solid var(--gold-line); border-radius:6px; padding:9px 11px; margin-bottom:8px; }
+  .fav-item .fn{ font-family:'Cinzel',serif; font-size:11px; color:var(--gold); width:34px; text-align:center; }
+  .fav-item .ft{ flex:1; min-width:0; }
+  .fav-item .a{ font-family:'Nanum Myeongjo',serif; font-weight:700; font-size:15px; color:var(--gold-2); }
+  .fav-item .b{ font-size:13px; color:var(--gold); opacity:.75; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .fav-item .rm{ border:1px solid var(--gold-line); background:transparent; color:var(--gold-2); border-radius:4px; padding:6px 9px; cursor:pointer; font-family:'Cinzel',serif; font-size:10px; }
+
+  /* game */
+  #gameView{ width:100%; max-width:340px; display:flex; flex-direction:column; align-items:center; }
+  .g-panel{ width:100%; padding:20px 18px; text-align:center; }
+  .g-title{ font-family:'Nanum Myeongjo',serif; font-weight:800; font-size:19px; color:var(--ink); margin-bottom:14px; }
+  .g-sec{ font-family:'Cinzel',serif; font-size:10px; letter-spacing:2px; color:var(--ink-2); text-transform:uppercase; margin:15px 0 8px; }
+  .g-seg{ display:inline-flex; gap:5px; flex-wrap:wrap; justify-content:center; }
+  .g-seg button{ border:1px solid var(--gold-line); background:#fff8; cursor:pointer; padding:7px 12px; font-family:'Cinzel',serif; font-size:11px; color:var(--ink); border-radius:3px; }
+  .g-seg button[aria-pressed="true"]{ background:linear-gradient(180deg,var(--gold-2),var(--gold)); color:#2a2008; border-color:var(--gold-deep); }
+  .g-diffnote{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:13.5px; color:var(--ink-2); margin-top:8px; }
+  .g-toggle{ margin-top:12px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; font-family:'Cinzel',serif; font-size:11px; color:var(--ink); border:1px solid var(--gold-line); border-radius:3px; padding:9px 13px; background:#fff8; }
+  .g-toggle .box{ width:16px; height:16px; border:1px solid var(--gold-deep); display:inline-flex; align-items:center; justify-content:center; color:#2a2008; font-size:12px; border-radius:2px; }
+  .g-toggle[aria-pressed="true"] .box{ background:linear-gradient(180deg,var(--gold-2),var(--gold)); }
+  .g-langrow{ display:flex; align-items:center; justify-content:space-between; margin:9px 0; }
+  .g-langrow > span{ font-family:'Cinzel',serif; font-size:11px; letter-spacing:.5px; color:var(--ink-2); }
+  .g-vs{ color:var(--gold-deep); font-size:15px; margin:1px 0; }
+  .g-link{ display:inline-block; margin-top:14px; background:none; border:0; cursor:pointer; font-family:'Cormorant Garamond',serif; font-size:14px; color:var(--gold-deep); text-decoration:underline; }
+  .g-note{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:13.5px; color:var(--ink-2); margin-top:14px; line-height:1.5; }
+  .g-turnbar{ font-family:'Cinzel',serif; font-size:12px; letter-spacing:1px; text-transform:uppercase; color:var(--gold-2); background:rgba(36,28,74,.7); border:1px solid var(--gold-line); border-radius:4px; padding:10px 14px; margin-bottom:14px; text-align:center; width:100%; }
+  .g-turnbar.ok{ color:#eafff5; background:rgba(40,110,84,.75); border-color:var(--ok); }
+  .g-turnbar.no{ color:#fff0ee; background:rgba(140,70,64,.7); border-color:var(--no); }
+  .g-turnbar b{ color:var(--gold); } .g-turnbar.ok b,.g-turnbar.no b{ color:#fff; }
+  .speak-line{ margin:2px 6px 4px; }
+  .speak-line .txt{ line-height:1.18; color:var(--ink); word-break:keep-all; }
+  .speak-line.lang-ko .txt{ font-family:'Nanum Myeongjo',serif; font-weight:800; font-size:clamp(19px,5.6vw,22px); }
+  .speak-line.lang-zh .txt{ font-family:'Noto Serif SC',serif; font-weight:700; font-size:clamp(19px,5.6vw,22px); }
+  .speak-line.lang-en .txt{ font-family:'Cinzel',serif; font-weight:700; font-size:clamp(15px,4.4vw,17px); text-transform:uppercase; }
+  .speak-line.lit .txt{ font-size:clamp(15px,4.4vw,17px); }
+  .speak-line .pron{ font-style:italic; font-size:13px; color:var(--ink-2); margin-top:3px; }
+  .speak-hint{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:14px; color:var(--ink-2); margin:6px 0 2px; }
+  .g-options{ width:100%; display:flex; flex-direction:column; gap:8px; margin-top:4px; }
+  .g-opt{ cursor:pointer; text-align:center; padding:13px 12px; border:1.5px solid var(--gold-line); border-radius:7px; background:radial-gradient(120% 100% at 50% 0%, #FCF4DE, var(--parch)); color:var(--ink); transition:.15s; }
+  .g-opt.ko{ font-family:'Nanum Myeongjo',serif; font-weight:700; font-size:clamp(15px,4.4vw,16px); }
+  .g-opt.zh{ font-family:'Noto Serif SC',serif; font-weight:700; font-size:clamp(15px,4.4vw,16px); }
+  .g-opt.en{ font-family:'Cinzel',serif; font-weight:700; font-size:clamp(12.5px,3.6vw,13px); text-transform:uppercase; }
+  .g-opt:active{ transform:scale(.98); background:linear-gradient(180deg,#fff,var(--parch)); }
+  .timer-wrap{ width:100%; margin:2px 0 10px; }
+  .tbar{ height:7px; border:1px solid var(--gold-line); border-radius:4px; overflow:hidden; background:rgba(36,28,74,.5); }
+  .tfill{ height:100%; width:100%; background:linear-gradient(90deg,var(--gold),var(--no)); }
+  .tnum{ text-align:center; font-family:'Cinzel',serif; font-size:11px; letter-spacing:1px; color:var(--gold-2); margin-top:4px; }
+  .hearts{ margin-top:14px; font-size:20px; letter-spacing:4px; color:var(--gold); }
+  .hearts .off{ color:var(--gold-2); opacity:.3; }
+  .hearts.big{ font-size:26px; margin:6px 0 10px; }
+  .g-btn{ margin-top:15px; cursor:pointer; font-family:'Cinzel',serif; font-size:14px; letter-spacing:2px; text-transform:uppercase; color:#2a2008; padding:13px 28px; border:0; border-radius:4px; background:linear-gradient(180deg,var(--gold-2),var(--gold)); box-shadow:0 4px 0 var(--gold-deep), 0 9px 18px rgba(224,188,99,.28); transition:.1s; width:100%; max-width:290px; }
+  .g-btn:active{ transform:translateY(3px); box-shadow:0 1px 0 var(--gold-deep); }
+  .g-btn.ghost{ background:transparent; color:var(--gold-2); border:1px solid var(--gold-line); box-shadow:none; }
+  .r-title{ font-family:'Nanum Myeongjo',serif; font-weight:800; font-size:24px; color:var(--ink); margin-bottom:4px; }
+  .r-en{ font-family:'Cinzel',serif; font-size:11px; letter-spacing:2px; color:var(--ink-2); text-transform:uppercase; }
+  .r-score{ font-family:'Cormorant Garamond',serif; font-size:16px; color:var(--ink-2); margin-top:8px; }
+  .r-sub{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:15px; color:var(--ink); margin-top:6px; line-height:1.5; }
+
+  /* tutorial overlay */
+  .tut-overlay{ position:fixed; inset:0; z-index:50; background:rgba(15,11,35,.86); backdrop-filter:blur(3px); display:flex; align-items:center; justify-content:center; padding:22px; }
+  .tut-card{ width:100%; max-width:330px; padding:24px 22px 20px; text-align:center; }
+  .tut-glyph{ font-size:52px; line-height:1; margin-bottom:6px; }
+  .tut-badge{ font-family:'Cinzel',serif; font-size:10px; letter-spacing:2px; color:var(--gold-deep); text-transform:uppercase; }
+  .tut-title{ font-family:'Nanum Myeongjo',serif; font-weight:800; font-size:21px; color:var(--ink); margin:8px 0 8px; }
+  .tut-body{ font-family:'Cormorant Garamond',serif; font-size:16px; color:var(--ink-2); line-height:1.55; min-height:78px; }
+  .tut-dots{ display:flex; gap:7px; justify-content:center; margin:14px 0 4px; }
+  .tut-dots i{ width:8px; height:8px; border-radius:50%; background:var(--gold-line); opacity:.4; }
+  .tut-dots i.on{ opacity:1; background:var(--gold-deep); transform:scale(1.15); }
+  .tut-btns{ display:flex; gap:10px; margin-top:12px; }
+  .tut-btns .g-btn{ margin-top:0; }
+
+  footer{ margin-top:26px; font-style:italic; font-size:13px; color:var(--gold-2); opacity:.6; text-align:center; max-width:340px; }
+  /* shadow / omen cards */
+  .art-frame.omen{ background:radial-gradient(120% 100% at 50% 20%, #F4EDF1, #E3D4DD); border-color:#8A6C82; box-shadow:inset 0 0 0 3px rgba(124,92,116,.25), inset 0 6px 16px rgba(90,60,80,.14); }
+  .art.omen .s, .art.omen .s2{ stroke:#7C5C72; } .art.omen .fill{ fill:#7C5C72; }
+  .card.omen .suit{ color:#7C5C72; }
+  .card.omen::before{ border-color:#8A6C82; box-shadow:inset 0 0 0 3px rgba(124,92,116,.2); }
+  .panel.omen .suit{ color:#7C5C72; }
+  .hidden{ display:none !important; }
+  .topnav{ width:100%; max-width:360px; margin-bottom:6px; }
+  .topnav a{ display:inline-block; font-family:'Nanum Myeongjo',serif; font-weight:700; font-size:15px; color:var(--gold-2); text-decoration:none; border:1px solid var(--gold-line); background:rgba(36,28,74,.6); border-radius:3px; padding:8px 12px; }
+  .sync{ font-family:'Nanum Myeongjo',serif; font-size:13px; line-height:1.5; color:var(--gold-2); opacity:.8; text-align:center; margin:10px 4px 0; }
+  .sync.bad{ color:#F0B3A8; opacity:1; font-weight:700; }
+  @media (prefers-reduced-motion: reduce){ .card,.card.flip,.draw,.fav,.g-btn{ transition:none !important; } }
+
+  /* ===== 호프 색감: 숲의 어둠 + 기름막 무지갯빛 ===== */
+  :root{
+    --night:#071013; --night-2:#121915;
+    --gold:#9FD7C9; --gold-2:#E4ECE7; --gold-deep:#D6E6DF; --gold-line:rgba(190,215,205,.2);
+    --parch:#16211D; --parch-2:#0D1512;
+    --ink:#E4ECE7; --ink-2:#93A89F;
+    --iri:linear-gradient(120deg,#E7C96F 0%,#D98A52 18%,#C774B8 38%,#7C72DA 58%,#4FA6C8 80%,#9FD7C9 100%);
+    --on-iri:#071013; --ok:#4FB892; --no:#D9677E;
+  }
+  body{ background:radial-gradient(120% 60% at 50% 0%, #0F2124 0%, #0B1613 45%, #071013 100%); background-attachment:fixed; color:var(--ink); }
+  body::before{ content:""; position:fixed; inset:0; pointer-events:none; opacity:.07; z-index:0;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  body > *{ position:relative; z-index:1; }
+  .tut-overlay{ position:fixed; z-index:50; }
+
+  /* 상단 한 줄: 돌아가기 + 모드 */
+  .bar{ width:100%; max-width:360px; display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .back{ width:42px; height:42px; display:flex; align-items:center; justify-content:center; border-radius:50%; border:1px solid var(--gold-line); color:var(--ink); text-decoration:none; font-size:20px; }
+  .modebar{ margin:0; gap:4px; padding:3px; border:1px solid var(--gold-line); border-radius:999px; }
+  .modebar button{ border:0; background:transparent; color:var(--ink-2); border-radius:999px; padding:8px 18px; font-family:'Nanum Myeongjo',serif; font-weight:700; font-size:14px; letter-spacing:0; }
+  .modebar button[aria-pressed="true"]{ background:var(--iri); color:var(--on-iri); box-shadow:none; }
+
+  /* 감상 컨트롤 한 줄: 언어 + 분류 */
+  .ctrl{ width:100%; max-width:360px; display:flex; gap:8px; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .segment{ gap:0; padding:3px; border:1px solid var(--gold-line); border-radius:999px; }
+  .segment button{ border:0; background:transparent; color:var(--ink-2); border-radius:999px; padding:7px 13px; font-family:'Nanum Myeongjo',serif; font-weight:700; font-size:14px; }
+  .segment button[aria-pressed="true"]{ background:var(--iri); color:var(--on-iri); box-shadow:none; border:0; }
+  .cat-sel{ appearance:none; -webkit-appearance:none; font-family:'Nanum Myeongjo',serif; font-weight:700; font-size:14px; color:var(--ink); background:transparent; border:1px solid var(--gold-line); border-radius:999px; padding:9px 30px 9px 14px; max-width:48%;
+    background-image:linear-gradient(45deg,transparent 50%,var(--ink-2) 50%),linear-gradient(135deg,var(--ink-2) 50%,transparent 50%); background-position:calc(100% - 17px) 55%,calc(100% - 12px) 55%; background-size:5px 5px; background-repeat:no-repeat; }
+  .cat-sel option{ background:#0D1512; color:var(--ink); }
+
+  /* 카드 · 패널 */
+  .deck::before,.deck::after{ display:none; }
+  .panel,.card{ background:linear-gradient(180deg,#17231F,#0C1411); border:1px solid var(--gold-line); box-shadow:0 20px 44px rgba(0,0,0,.55); }
+  .card{ border:1.5px solid transparent; background:linear-gradient(180deg,#17231F,#0C1411) padding-box, var(--iri) border-box; padding:16px 14px 18px; }
+  .card::before{ display:none; }
+  #card .suit, #card .arcana{ display:none; }
+  #card .card-top{ justify-content:center; }
+  .numeral{ color:var(--ink-2); font-size:12px; }
+  .numeral::before,.numeral::after{ color:var(--gold-line); }
+  .art-frame{ background:radial-gradient(circle at 50% 35%, #1D3531, #0B1513); border:1px solid var(--gold-line); box-shadow:none; }
+  .art .s,.art .s2{ stroke:var(--gold-deep); } .art .fill{ fill:var(--gold-deep); }
+  .back-q{ color:var(--gold-deep); }
+  .orig,.arcana,.credit,.pron{ color:var(--ink-2); }
+  .arcana .kcat{ color:var(--ink); }
+  .line .txt,.speak-line .txt{ color:var(--ink); }
+  .line.secondary .txt{ color:var(--ink-2); }
+  .fav{ background:rgba(7,16,19,.75); border:1px solid var(--gold-line); color:var(--ink); }
+  .fav.on{ background:var(--iri); color:var(--on-iri); border-color:transparent; }
+
+  /* 그림자 · 경고 카드 */
+  .art-frame.omen{ background:radial-gradient(circle at 50% 35%, #2B1E30, #120E15); border-color:rgba(199,116,184,.4); box-shadow:none; }
+  .art.omen .s,.art.omen .s2{ stroke:#E3A6CF; } .art.omen .fill{ fill:#E3A6CF; }
+  .card.omen .suit,.panel.omen .suit{ color:#E3A6CF; }
+
+  /* 즐겨찾기 */
+  .tray{ margin-top:22px; }
+  .tray h2{ font-family:'Nanum Myeongjo',serif; font-size:14px; letter-spacing:0; color:var(--ink-2); }
+  .empty{ border:0; padding:6px; font-family:'Nanum Myeongjo',serif; font-style:normal; font-size:14px; color:var(--ink-2); }
+  .fav-item{ background:rgba(255,255,255,.035); border:1px solid var(--gold-line); border-radius:10px; }
+  .fav-item .fn{ color:var(--ink-2); }
+  .fav-item .a{ color:var(--ink); } .fav-item .b{ color:var(--ink-2); opacity:1; }
+  .fav-item .rm{ border-color:var(--gold-line); color:var(--ink-2); border-radius:999px; padding:6px 11px; font-family:'Nanum Myeongjo',serif; }
+  .sync:empty{ display:none; }
+  .sync.bad{ color:#F2A7B6; }
+
+  /* 게임 */
+  .g-title,.r-title,.tut-title{ color:var(--ink); }
+  .g-sec,.g-diffnote,.g-langrow > span,.g-note,.r-en,.r-score,.speak-hint,.tut-body{ color:var(--ink-2); }
+  .r-sub{ color:var(--ink); }
+  .g-seg button,.g-toggle{ background:transparent; border:1px solid var(--gold-line); color:var(--ink); border-radius:999px; }
+  .g-seg button[aria-pressed="true"]{ background:var(--iri); color:var(--on-iri); border-color:transparent; }
+  .g-toggle .box{ border-color:var(--ink-2); border-radius:50%; color:var(--on-iri); }
+  .g-toggle[aria-pressed="true"] .box{ background:var(--iri); border-color:transparent; }
+  .g-vs,.g-link,.tut-badge{ color:var(--gold); }
+  .g-turnbar{ background:rgba(255,255,255,.04); border:1px solid var(--gold-line); color:var(--ink); border-radius:999px; font-family:'Nanum Myeongjo',serif; letter-spacing:0; text-transform:none; font-size:14px; }
+  .g-turnbar b{ color:var(--gold); }
+  .g-turnbar.ok{ background:rgba(79,184,146,.18); border-color:var(--ok); color:#DDF5EC; }
+  .g-turnbar.no{ background:rgba(217,103,126,.16); border-color:var(--no); color:#FBE3E8; }
+  .g-opt{ background:rgba(255,255,255,.035); border:1px solid var(--gold-line); color:var(--ink); border-radius:12px; }
+  .g-opt:active{ background:rgba(255,255,255,.09); }
+  .tbar{ background:rgba(255,255,255,.06); border-color:var(--gold-line); }
+  .tfill{ background:var(--iri); }
+  .tnum{ color:var(--ink-2); }
+  .hearts{ color:#D98AC6; } .hearts .off{ color:var(--ink-2); }
+  .g-btn{ background:var(--iri); color:var(--on-iri); box-shadow:none; border-radius:999px; font-family:'Nanum Myeongjo',serif; font-weight:800; letter-spacing:0; text-transform:none; }
+  .g-btn:active{ box-shadow:none; }
+  .g-btn.ghost{ background:transparent; color:var(--ink); border:1px solid var(--gold-line); }
+  .tut-overlay{ background:rgba(4,9,10,.88); }
+  .tut-dots i{ background:var(--ink-2); } .tut-dots i.on{ background:var(--gold); }
+  footer{ color:var(--ink-2); opacity:1; font-family:'Nanum Myeongjo',serif; font-style:normal; }
+  footer:empty{ display:none; }
+</style>
+</head>
+<body>
+  <div class="bar">
+    <a class="back" href="/" aria-label="몰리로 돌아가기">←</a>
+    <div class="modebar" id="modebar" role="group" aria-label="모드">
+      <button data-mode="browse" aria-pressed="true">감상</button>
+      <button data-mode="game" aria-pressed="false">게임</button>
+    </div>
+  </div>
+
+  <div id="browseView">
+    <div class="ctrl">
+      <div class="segment" id="segment" role="group" aria-label="먼저 읽을 언어">
+        <button data-lang="ko" aria-pressed="true">한</button>
+        <button data-lang="zh" aria-pressed="false">中</button>
+        <button data-lang="en" aria-pressed="false">EN</button>
+      </div>
+      <select class="cat-sel" id="cats" aria-label="카드 분류"></select>
+    </div>
+    <div class="stage">
+      <div class="deck">
+        <div class="card" id="card" role="button" tabindex="0" aria-label="다음 카드 뽑기">
+          <div class="card-top"><span class="suit" id="suitL">♥</span><span class="numeral" id="numeral">I</span><span class="suit" id="suitR">♥</span></div>
+          <div class="art-frame"><svg class="art" id="art" viewBox="0 0 100 100"></svg></div>
+          <div class="orig" id="orig"></div>
+          <div class="arcana" id="arcana"></div>
+          <div class="lines" id="lines"></div>
+          <div class="credit" id="credit"></div>
+          <button class="fav" id="fav" aria-label="즐겨찾기">♡</button>
+        </div>
+      </div>
+    </div>
+    <div class="tray"><h2>즐겨찾기</h2><div id="favList"></div><div class="sync" id="sync"></div></div>
+  </div>
+
+  <div id="gameView" class="hidden"><div id="gameStage"></div></div>
+
+  <div id="tut" class="tut-overlay hidden">
+    <div class="tut-card panel">
+      <div class="tut-glyph" id="tutGlyph">📱</div>
+      <div class="tut-badge" id="tutBadge">HOW TO PLAY</div>
+      <div class="tut-title" id="tutTitle"></div>
+      <div class="tut-body" id="tutBody"></div>
+      <div class="tut-dots" id="tutDots"></div>
+      <div class="tut-btns">
+        <button class="g-btn ghost" id="tutSkip">건너뛰기</button>
+        <button class="g-btn" id="tutNext">다음</button>
+      </div>
+    </div>
+  </div>
+
+  <footer id="foot"></footer>
+
+<script>
+const SYMBOLS = {
+  flameHeart:`<path class="s" d="M50 84 C14 58 20 30 39 30 C47 30 50 38 50 43 C50 38 53 30 61 30 C80 30 86 58 50 84 Z"/><path class="s" d="M50 26 C45 19 45 13 50 8 C55 13 55 19 50 26 Z"/><path class="s2" d="M50 30 C47 26 47 22 50 19 C53 22 53 26 50 30 Z"/>`,
+  sun:`<circle class="s" cx="50" cy="50" r="15"/><circle class="fill" cx="44" cy="48" r="1.6"/><circle class="fill" cx="56" cy="48" r="1.6"/><path class="s2" d="M43 55 Q50 61 57 55"/><line class="s" x1="50" y1="28" x2="50" y2="18"/><line class="s" x1="50" y1="72" x2="50" y2="82"/><line class="s" x1="28" y1="50" x2="18" y2="50"/><line class="s" x1="72" y1="50" x2="82" y2="50"/><line class="s2" x1="35" y1="35" x2="28" y2="28"/><line class="s2" x1="65" y1="35" x2="72" y2="28"/><line class="s2" x1="35" y1="65" x2="28" y2="72"/><line class="s2" x1="65" y1="65" x2="72" y2="72"/>`,
+  moon:`<path class="s" d="M62 16 A34 34 0 1 0 62 84 A26 26 0 1 1 62 16 Z"/><circle class="fill" cx="44" cy="40" r="1.5"/><path class="s2" d="M38 50 Q43 54 48 50"/><path class="fill" d="M80 30 l1.6 4.4 4.4 1.6 -4.4 1.6 -1.6 4.4 -1.6 -4.4 -4.4 -1.6 4.4 -1.6 z"/><path class="fill" d="M74 66 l1.2 3.4 3.4 1.2 -3.4 1.2 -1.2 3.4 -1.2 -3.4 -3.4 -1.2 3.4 -1.2 z"/>`,
+  star:`<path class="s" d="M50 12 L56 44 L88 50 L56 56 L50 88 L44 56 L12 50 L44 44 Z"/><path class="fill" d="M78 24 l1.3 3.6 3.6 1.3 -3.6 1.3 -1.3 3.6 -1.3 -3.6 -3.6 -1.3 3.6 -1.3 z"/><path class="fill" d="M22 74 l1.1 3 3 1.1 -3 1.1 -1.1 3 -1.1 -3 -3 -1.1 3 -1.1 z"/>`,
+  infinity:`<path class="s" d="M30 50 C30 37 47 37 50 50 C53 63 70 63 70 50 C70 37 53 37 50 50 C47 63 30 63 30 50 Z"/><path class="fill" d="M30 50 C27 46 28 42 30 44 C32 42 33 46 30 50 Z"/><path class="fill" d="M70 50 C67 46 68 42 70 44 C72 42 73 46 70 50 Z"/>`,
+  handHeart:`<path class="s" d="M24 64 Q50 92 76 64"/><path class="s" d="M50 54 C40 42 43 30 50 36 C57 30 60 42 50 54 Z"/><line class="s2" x1="50" y1="26" x2="50" y2="20"/><line class="s2" x1="40" y1="30" x2="36" y2="25"/><line class="s2" x1="60" y1="30" x2="64" y2="25"/>`,
+  cup:`<path class="s" d="M36 34 Q50 40 64 34"/><path class="s" d="M36 34 Q50 28 64 34"/><path class="s" d="M37 35 Q50 62 63 35"/><line class="s" x1="50" y1="60" x2="50" y2="72"/><path class="s" d="M39 76 Q50 70 61 76"/><line class="s" x1="39" y1="76" x2="61" y2="76"/>`,
+  twoCups:`<g transform="rotate(-14 40 50)"><path class="s" d="M28 40 Q40 45 52 40"/><path class="s" d="M29 41 Q40 60 51 41"/><line class="s" x1="40" y1="58" x2="40" y2="68"/><line class="s" x1="32" y1="70" x2="48" y2="70"/></g><g transform="rotate(14 60 50)"><path class="s" d="M48 40 Q60 45 72 40"/><path class="s" d="M49 41 Q60 60 71 41"/><line class="s" x1="60" y1="58" x2="60" y2="68"/><line class="s" x1="52" y1="70" x2="68" y2="70"/></g><path class="fill" d="M50 26 C46 22 47 18 50 20 C53 18 54 22 50 26 Z"/>`,
+  bedRest:`<path class="s" d="M72 24 a11 11 0 1 0 5 18 a9 9 0 1 1 -5 -18 Z"/><path class="s2" d="M22 32 h11 l-11 12 h11"/><path class="s2" d="M38 22 h8 l-8 9 h8"/><path class="s2" d="M50 14 h6 l-6 7 h6"/><path class="s" d="M18 76 Q50 66 82 76"/>`,
+  hands:`<path class="s" d="M14 66 L40 52 L52 58"/><path class="s" d="M86 66 L60 52 L48 58"/><rect class="s" x="43" y="50" width="14" height="13" rx="3"/><path class="s2" d="M50 42 C45 37 46 31 50 34 C54 31 55 37 50 42 Z"/>`,
+  dove:`<path class="s" d="M28 58 Q46 48 66 52 Q60 63 44 64 Q33 64 28 58 Z"/><path class="s" d="M46 52 Q52 34 68 32 Q60 46 55 55"/><path class="s" d="M28 58 L18 55 L25 63"/><path class="s" d="M66 52 q6 -2 9 1 q-3 4 -8 3"/><circle class="fill" cx="70" cy="52" r="1.2"/><path class="s2" d="M74 55 q7 3 10 9"/><path class="s2" d="M80 60 q3 -3 6 -2"/><path class="s2" d="M84 66 q3 -2 6 -1"/>`,
+  path:`<path class="s" d="M10 80 Q30 60 46 80"/><path class="s" d="M46 80 Q64 60 90 80"/><path class="s" d="M44 84 C47 70 39 64 50 56 C60 49 52 42 50 34"/><path class="fill" d="M66 22 l1.6 4.4 4.4 1.6 -4.4 1.6 -1.6 4.4 -1.6 -4.4 -4.4 -1.6 4.4 -1.6 z"/>`,
+  steamCup:`<path class="s" d="M34 50 L38 78 Q50 85 62 78 L66 50 Z"/><path class="s" d="M32 50 Q50 44 68 50"/><path class="s" d="M32 50 Q50 56 68 50"/><path class="s" d="M66 56 q13 0 9 15 q-3 4 -9 3"/><path class="s2" d="M44 40 q5 -6 0 -12 q-5 -6 0 -12"/><path class="s2" d="M56 40 q5 -6 0 -12 q-5 -6 0 -12"/>`,
+  embrace:`<circle class="s" cx="42" cy="38" r="8"/><circle class="s" cx="58" cy="38" r="8"/><path class="s" d="M28 80 C28 56 42 50 50 55 C58 50 72 56 72 80"/><path class="s2" d="M38 58 Q50 66 62 58"/>`,
+  scales:`<circle class="s" cx="50" cy="24" r="3"/><line class="s" x1="50" y1="27" x2="50" y2="66"/><line class="s" x1="28" y1="34" x2="72" y2="34"/><line class="s2" x1="28" y1="34" x2="24" y2="50"/><line class="s2" x1="28" y1="34" x2="32" y2="50"/><path class="s" d="M22 50 Q28 59 34 50"/><line class="s2" x1="72" y1="34" x2="68" y2="50"/><line class="s2" x1="72" y1="34" x2="76" y2="50"/><path class="s" d="M66 50 Q72 59 78 50"/><path class="s" d="M40 72 L60 72"/><line class="s" x1="50" y1="66" x2="50" y2="72"/>`,
+  tearMoon:`<path class="s" d="M60 18 A32 32 0 1 0 60 82 A25 25 0 1 1 60 18 Z"/><circle class="fill" cx="43" cy="42" r="1.4"/><path class="s2" d="M43 60 C39 70 39 78 43 82 C47 78 47 70 43 60 Z"/>`,
+  mountainStar:`<path class="s" d="M12 80 L36 40 L52 64 L62 50 L88 80 Z"/><path class="s2" d="M30 48 L36 40 L42 48"/><path class="s2" d="M57 57 L62 50 L67 57"/><path class="fill" d="M68 22 l1.8 5 5 1.8 -5 1.8 -1.8 5 -1.8 -5 -5 -1.8 5 -1.8 z"/>`,
+  rose:`<path class="s" d="M50 30 C40 30 36 40 42 46 C34 44 30 54 38 58 C34 66 44 72 50 66 C56 72 66 66 62 58 C70 54 66 44 58 46 C64 40 60 30 50 30 Z"/><circle class="s2" cx="50" cy="48" r="7"/><path class="s2" d="M46 48 Q50 44 54 48"/><line class="s" x1="50" y1="66" x2="50" y2="86"/><path class="s2" d="M50 74 Q40 70 36 76 Q46 80 50 74"/><path class="s2" d="M50 78 Q60 74 64 80 Q54 84 50 78"/>`,
+  lyre:`<path class="s" d="M38 74 C26 60 30 34 42 28"/><path class="s" d="M62 74 C74 60 70 34 58 28"/><line class="s" x1="42" y1="30" x2="58" y2="30"/><path class="s" d="M38 74 Q50 82 62 74"/><line class="s2" x1="45" y1="34" x2="45" y2="74"/><line class="s2" x1="50" y1="33" x2="50" y2="76"/><line class="s2" x1="55" y1="34" x2="55" y2="74"/>`,
+  seaWaves:`<circle class="s2" cx="50" cy="26" r="8"/><path class="s" d="M16 46 q8 -8 16 0 t16 0 t16 0 t16 0"/><path class="s" d="M16 58 q8 -8 16 0 t16 0 t16 0 t16 0"/><path class="s" d="M16 70 q8 -8 16 0 t16 0 t16 0 t16 0"/>`,
+  kiss:`<path class="s" d="M30 52 Q40 44 50 52 Q60 44 70 52 Q60 62 50 58 Q40 62 30 52 Z"/><path class="s2" d="M30 52 Q50 56 70 52"/><path class="s2" d="M50 40 C45 34 46 28 50 31 C54 28 55 34 50 40 Z"/>`,
+  masks:`<ellipse class="s" cx="36" cy="50" rx="13" ry="18"/><circle class="fill" cx="31" cy="46" r="1.4"/><circle class="fill" cx="41" cy="46" r="1.4"/><path class="s2" d="M30 58 Q36 63 42 58"/><ellipse class="s" cx="64" cy="52" rx="13" ry="18"/><circle class="fill" cx="59" cy="48" r="1.4"/><circle class="fill" cx="69" cy="48" r="1.4"/><path class="s2" d="M58 62 Q64 57 70 62"/>`,
+  coin:`<circle class="s" cx="50" cy="50" r="26"/><circle class="s2" cx="50" cy="50" r="20"/><path class="fill" d="M50 40 l2.4 6.6 6.9 .3 -5.4 4.3 1.9 6.7 -5.8 -3.8 -5.8 3.8 1.9 -6.7 -5.4 -4.3 6.9 -.3 z"/>`,
+  card:`<rect class="s" x="22" y="36" width="56" height="34" rx="4"/><line class="s" x1="22" y1="46" x2="78" y2="46"/><line class="s2" x1="30" y1="58" x2="46" y2="58"/><line class="s2" x1="30" y1="63" x2="40" y2="63"/>`,
+  chili:`<path class="s" d="M40 30 q10 -6 16 2"/><path class="s" d="M44 34 C40 50 46 70 56 74 C70 66 66 44 52 34 Z"/><path class="s2" d="M52 36 q4 -6 2 -10"/>`,
+  wc:`<rect class="s" x="28" y="30" width="44" height="28" rx="3"/><path class="s" d="M44 44 h14 m-6 -5 l6 5 -6 5"/><line class="s" x1="50" y1="58" x2="50" y2="80"/><line class="s2" x1="42" y1="80" x2="58" y2="80"/>`,
+  wifi:`<path class="s" d="M26 44 q24 -22 48 0"/><path class="s" d="M34 52 q16 -14 32 0"/><path class="s" d="M42 60 q8 -7 16 0"/><circle class="fill" cx="50" cy="70" r="2.6"/>`,
+  subway:`<rect class="s" x="30" y="26" width="40" height="40" rx="7"/><line class="s" x1="30" y1="46" x2="70" y2="46"/><rect class="s2" x="36" y="32" width="12" height="10" rx="2"/><rect class="s2" x="52" y="32" width="12" height="10" rx="2"/><circle class="fill" cx="40" cy="56" r="2.2"/><circle class="fill" cx="60" cy="56" r="2.2"/><line class="s" x1="38" y1="66" x2="32" y2="76"/><line class="s" x1="62" y1="66" x2="68" y2="76"/>`,
+  pill:`<g transform="rotate(-32 50 50)"><rect class="s" x="28" y="42" width="44" height="16" rx="8"/><line class="s" x1="50" y1="42" x2="50" y2="58"/></g><path class="s2" d="M40 40 q3 -3 6 -1"/>`,
+  bag:`<path class="s" d="M32 40 L68 40 L64 78 L36 78 Z"/><path class="s" d="M42 40 v-6 a8 8 0 0 1 16 0 v6"/><line class="s2" x1="45" y1="54" x2="55" y2="54"/>`,
+  speech:`<path class="s" d="M26 34 h48 a4 4 0 0 1 4 4 v24 a4 4 0 0 1 -4 4 H44 l-12 10 v-10 h-6 a4 4 0 0 1 -4 -4 V38 a4 4 0 0 1 4 -4 Z"/><circle class="fill" cx="40" cy="50" r="2.2"/><circle class="fill" cx="50" cy="50" r="2.2"/><circle class="fill" cx="60" cy="50" r="2.2"/>`,
+  column:`<rect class="s" x="32" y="28" width="36" height="7"/><rect class="s" x="28" y="74" width="44" height="7"/><rect class="s" x="34" y="68" width="32" height="6"/><line class="s2" x1="42" y1="35" x2="42" y2="68"/><line class="s2" x1="50" y1="35" x2="50" y2="68"/><line class="s2" x1="58" y1="35" x2="58" y2="68"/>`,
+  tower:`<rect class="s" x="40" y="34" width="20" height="46"/><path class="s" d="M38 34 L50 22 L62 34 Z"/><line class="s" x1="50" y1="22" x2="50" y2="15"/><path class="s2" d="M50 44 L44 56 L54 58 L48 72"/><line class="s2" x1="46" y1="46" x2="46" y2="60"/><line class="s2" x1="54" y1="50" x2="54" y2="62"/><circle class="fill" cx="30" cy="42" r="1.4"/><circle class="fill" cx="70" cy="46" r="1.4"/>`,
+  scythe:`<line class="s" x1="42" y1="20" x2="52" y2="82"/><path class="s" d="M42 24 C60 22 74 32 78 46 C66 40 54 38 45 41"/>`,
+  chain:`<ellipse class="s" cx="41" cy="50" rx="9" ry="16" transform="rotate(-28 41 50)"/><ellipse class="s" cx="59" cy="50" rx="9" ry="16" transform="rotate(-28 59 50)"/>`,
+  brokenHeart:`<path class="s" d="M50 82 C16 58 22 32 40 32 C48 32 50 40 50 45 C50 40 52 32 60 32 C78 32 84 58 50 82 Z"/><path class="s2" d="M50 40 L44 52 L54 60 L47 72"/>`,
+  swordDown:`<line class="s" x1="50" y1="20" x2="50" y2="70"/><path class="s" d="M50 82 L46 70 L54 70 Z"/><line class="s" x1="38" y1="27" x2="62" y2="27"/><circle class="s2" cx="50" cy="21" r="3"/>`,
+  hourglass:`<path class="s" d="M34 24 H66"/><path class="s" d="M34 80 H66"/><path class="s" d="M37 24 C37 44 63 44 63 24"/><path class="s" d="M37 80 C37 60 63 60 63 80"/><path class="fill" d="M45 33 h10 l-5 8 z"/><path class="s2" d="M50 54 l-6 22 h12 z"/>`,
+  spilledCup:`<g transform="rotate(36 50 50)"><path class="s" d="M40 40 Q50 46 60 40"/><path class="s" d="M41 41 Q50 60 59 41"/><line class="s" x1="50" y1="58" x2="50" y2="66"/><path class="s" d="M42 68 Q50 63 58 68"/></g><path class="s2" d="M60 58 q9 5 7 17"/><circle class="fill" cx="72" cy="74" r="1.5"/><circle class="fill" cx="64" cy="70" r="1.2"/>`,
+  wall:`<rect class="s" x="24" y="40" width="52" height="34"/><line class="s2" x1="24" y1="51" x2="76" y2="51"/><line class="s2" x1="24" y1="62" x2="76" y2="62"/><line class="s2" x1="40" y1="40" x2="40" y2="51"/><line class="s2" x1="58" y1="40" x2="58" y2="51"/><line class="s2" x1="32" y1="51" x2="32" y2="62"/><line class="s2" x1="50" y1="51" x2="50" y2="62"/><line class="s2" x1="68" y1="51" x2="68" y2="62"/><line class="s2" x1="40" y1="62" x2="40" y2="74"/><line class="s2" x1="58" y1="62" x2="58" y2="74"/>`,
+  cloudRain:`<path class="s" d="M35 52 a10 10 0 0 1 3 -20 a13 13 0 0 1 25 3 a9 9 0 0 1 1 17 Z"/><line class="s2" x1="39" y1="58" x2="35" y2="69"/><line class="s2" x1="50" y1="58" x2="46" y2="71"/><line class="s2" x1="61" y1="58" x2="57" y2="69"/>`,
+};
+
+const CATS = {
+  '사랑':{glyph:'♥', arcana:'The Lovers'}, '일상':{glyph:'☉', arcana:'The Hearth'},
+  '데이트':{glyph:'❀', arcana:'The Journey'}, '감정':{glyph:'❦', arcana:'The Heart'},
+  '화해':{glyph:'☯', arcana:'Temperance'}, '응원':{glyph:'✦', arcana:'Strength'},
+  '생활':{glyph:'⌂', arcana:'The Wayfarer'}, '명대사':{glyph:'⚜', arcana:'The Poet'},
+  '부조리':{glyph:'∅', arcana:'The Fool'}, '고대극':{glyph:'Ω', arcana:'The Oracle'},
+  '그림자':{glyph:'☾', arcana:'The Shadow'}, '경고':{glyph:'☓', arcana:'The Omen'},
+};
+const LIT=['명대사','부조리','고대극','경고']; const EVERYDAY=['사랑','일상','데이트','감정','화해','응원','생활','그림자'];
+const OMEN=['그림자','경고'];
+
+const DECK = [
+  ['사랑','flameHeart','사랑해','saranghae','我爱你','Wǒ ài nǐ','I love you'],
+  ['사랑','moon','보고 싶었어','bogo sipeosseo','我好想你','Wǒ hǎo xiǎng nǐ','I missed you'],
+  ['사랑','sun','넌 나의 전부야','neon naui jeonbuya','你是我的一切','Nǐ shì wǒ de yíqiè','You are my all'],
+  ['사랑','star','너뿐이야','neoppuniya','只有你','Zhǐyǒu nǐ','Only you'],
+  ['사랑','infinity','평생 함께하자','pyeongsaeng hamkkehaja','我们永远在一起','Wǒmen yǒngyuǎn zài yìqǐ','Together forever'],
+  ['사랑','handHeart','네 생각뿐이야','ne saenggak ppuniya','满脑子都是你','Mǎn nǎozi dōu shì nǐ','I only think of you'],
+  ['일상','cup','밥 먹었어?','bap meogeosseo?','你吃饭了吗？','Nǐ chīfàn le ma?','Have you eaten?'],
+  ['일상','twoCups','같이 밥 먹자','gachi bap meokja','一起吃饭吧','Yìqǐ chīfàn ba','Let us dine together'],
+  ['일상','sun','좋은 아침','joeun achim','早安','Zǎo ān','Good morning'],
+  ['일상','bedRest','잘 자','jal ja','晚安','Wǎn ān','Good night'],
+  ['일상','hands','몸조심해','momjosimhae','注意身体','Zhùyì shēntǐ','Take care'],
+  ['일상','dove','도착하면 연락해','dochakhamyeon yeollakae','到了给我发消息','Dào le gěi wǒ fā xiāoxi','Message me when you arrive'],
+  ['일상','moon','오늘 하루 어땠어?','oneul haru eottaesseo?','今天过得怎么样？','Jīntiān guò de zěnmeyàng?','How was your day?'],
+  ['데이트','path','데이트하러 가자','deiteuhareo gaja','我们去约会吧','Wǒmen qù yuēhuì ba','Let us go on a date'],
+  ['데이트','moon','영화 보자','yeonghwa boja','我们看电影吧','Wǒmen kàn diànyǐng ba','Let us watch a film'],
+  ['데이트','hands','손 잡아도 돼?','son jaba do dwae?','可以牵你的手吗？','Kěyǐ qiān nǐ de shǒu ma?','May I hold your hand?'],
+  ['데이트','path','같이 걷자','gachi geotja','一起走走吧','Yìqǐ zǒuzou ba','Let us walk together'],
+  ['데이트','cup','뭐 먹고 싶어?','mwo meokgo sipeo?','你想吃什么？','Nǐ xiǎng chī shénme?','What shall we eat?'],
+  ['데이트','steamCup','커피 마실래?','keopi masillae?','要喝咖啡吗？','Yào hē kāfēi ma?','Shall we have coffee?'],
+  ['감정','sun','너랑 있어서 행복해','neorang isseoseo haengbokae','和你在一起很幸福','Hé nǐ zài yìqǐ hěn xìngfú','Happy beside you'],
+  ['감정','handHeart','고마워','gomawo','谢谢你','Xièxie nǐ','Thank you'],
+  ['감정','embrace','안아주고 싶어','anajugo sipeo','我想抱抱你','Wǒ xiǎng bàobao nǐ','I want to hold you'],
+  ['감정','sun','네 미소가 좋아','ne misoga joa','我喜欢你的笑容','Wǒ xǐhuan nǐ de xiàoróng','I love your smile'],
+  ['감정','star','네가 자랑스러워','nega jarangseureowo','我为你骄傲','Wǒ wèi nǐ jiāo’ào','I am proud of you'],
+  ['화해','dove','미안해','mianhae','对不起','Duìbuqǐ','I am sorry'],
+  ['화해','moon','괜찮아','gwaenchana','没关系','Méi guānxi','It is alright'],
+  ['화해','scales','그런 뜻 아니었어','geureon tteut anieosseo','我不是那个意思','Wǒ bú shì nàge yìsi','That is not what I meant'],
+  ['화해','scales','우리 얘기하자','uri yaegihaja','我们谈谈吧','Wǒmen tántan ba','Let us talk it through'],
+  ['화해','embrace','안아줄래?','anajullae?','可以抱抱我吗？','Kěyǐ bàobao wǒ ma?','Will you hold me?'],
+  ['응원','mountainStar','힘내','himnae','加油','Jiāyóu','You’ve got this'],
+  ['응원','star','잘하고 있어','jalhago isseo','你做得很好','Nǐ zuò de hěn hǎo','You are doing well'],
+  ['응원','hands','내가 옆에 있을게','naega yeope isseulge','我会陪着你','Wǒ huì péizhe nǐ','I will be by your side'],
+  ['응원','tearMoon','울지 마','ulji ma','别哭','Bié kū','Do not cry'],
+  ['응원','bedRest','푹 쉬어','puk swieo','好好休息','Hǎohǎo xiūxi','Rest well'],
+  ['응원','mountainStar','넌 할 수 있어','neon hal su isseo','你可以的','Nǐ kěyǐ de','You can do it'],
+  ['생활','coin','이거 얼마예요?','igeo eolmayeyo?','这个多少钱？','Zhège duōshǎo qián?','How much is this?'],
+  ['생활','card','카드로 계산할게요','kadeuro gyesanhalgeyo','我用卡付','Wǒ yòng kǎ fù','I’ll pay by card'],
+  ['생활','chili','덜 맵게 해주세요','deol maepge haejuseyo','请做得不辣一点','Qǐng zuò de bú là yìdiǎn','Make it less spicy, please'],
+  ['생활','bag','포장해 주세요','pojanghae juseyo','请帮我打包','Qǐng bāng wǒ dǎbāo','To go, please'],
+  ['생활','wc','화장실 어디예요?','hwajangsil eodiyeyo?','洗手间在哪里？','Xǐshǒujiān zài nǎlǐ?','Where is the restroom?'],
+  ['생활','wifi','와이파이 비밀번호 뭐예요?','waipai bimilbeonho mwoyeyo?','Wi-Fi 密码是多少？','Wi-Fi mìmǎ shì duōshǎo?','What’s the wifi password?'],
+  ['생활','subway','지하철 몇 호선이에요?','jihacheol myeot hoseonieyo?','地铁是几号线？','Dìtiě shì jǐ hào xiàn?','Which subway line is it?'],
+  ['생활','pill','이 약 어떻게 먹어요?','i yak eotteoke meogeoyo?','这个药怎么吃？','Zhège yào zěnme chī?','How do I take this medicine?'],
+  ['생활','speech','천천히 말해 주세요','cheoncheonhi malhae juseyo','请说慢一点','Qǐng shuō màn yìdiǎn','Please speak slowly'],
+  ['생활','speech','한국어 조금밖에 못해요','hangugeo jogeumbakke motaeyo','我只会一点韩语','Wǒ zhǐ huì yìdiǎn Hányǔ','I only speak a little Korean'],
+  ['생활','hands','도와주실 수 있어요?','dowajusil su isseoyo?','可以帮我吗？','Kěyǐ bāng wǒ ma?','Could you help me?'],
+  ['생활','coin','조금만 깎아주세요','jogeumman kkakkajuseyo','能便宜一点吗？','Néng piányi yìdiǎn ma?','Can you give a little discount?'],
+  ['생활','bag','배달 시킬까?','baedal sikilkka?','要不要叫外卖？','Yào bú yào jiào wàimài?','Shall we order delivery?'],
+  ['생활','card','영수증 주세요','yeongsujeung juseyo','请给我收据','Qǐng gěi wǒ shōujù','A receipt, please'],
+  ['명대사','rose','이별은 이토록 달콤한 슬픔이에요','ibyeoreun itorok dalkomhan seulpeumieyo','离别是如此甜蜜的忧伤','Líbié shì rúcǐ tiánmì de yōushāng','Parting is such sweet sorrow','Romeo & Juliet · Shakespeare',''],
+  ['명대사','path','진실한 사랑은 결코 순탄치 않죠','jinsilhan sarangeun gyeolko suntanchi anchyo','真爱之路从不平坦','Zhēn’ài zhī lù cóng bù píngtǎn','True love never did run smooth','A Midsummer Night’s Dream · Shakespeare',''],
+  ['명대사','lyre','음악이 사랑의 양식이라면, 계속 연주해줘요','eumagi sarangui yangsigiramyeon, gyesok yeonjuhaejwoyo','若音乐是爱的食粮，就奏下去吧','Ruò yīnyuè shì ài de shíliáng, jiù zòu xiàqù ba','If music be the food of love, play on','Twelfth Night · Shakespeare',''],
+  ['명대사','star','별이 불꽃임은 의심해도, 내 사랑은 의심 말아요','byeori bulkkochimeun uisimhaedo, nae sarangeun uisim marayo','可疑星辰是火，别疑我的爱','Kě yí xīngchén shì huǒ, bié yí wǒ de ài','Doubt the stars are fire, never my love','Hamlet · Shakespeare',''],
+  ['명대사','seaWaves','내 사랑은 바다처럼 끝이 없어요','nae sarangeun badacheoreom kkeuchi eopseoyo','我的爱如海洋般无边','Wǒ de ài rú hǎiyáng bān wúbiān','My love is boundless as the sea','Romeo & Juliet · Shakespeare',''],
+  ['명대사','sun','멈추어라, 너 참으로 아름답구나!','meomchueora, neo chameuro areumdapguna','停留一下吧，你如此美丽！','Tíngliú yíxià ba, nǐ rúcǐ měilì','Stay a while — you are so fair!','Faust · Goethe','Verweile doch, du bist so schön!'],
+  ['명대사','kiss','입맞춤은 입술에 속삭이는 비밀이에요','immatchumeun ipsure soksagineun bimirieyo','亲吻，是对唇诉说的秘密','Qīnwěn, shì duì chún sùshuō de mìmì','A kiss is a secret told to the lips','Cyrano de Bergerac · Rostand','Un baiser… un secret qu’on dit à la bouche'],
+  ['명대사','masks','로맨스의 본질은 불확실함이죠','romaenseuui bonjireun bulhwaksilhamijyo','浪漫的本质是不确定','Làngmàn de běnzhì shì bù quèdìng','The essence of romance is uncertainty','The Importance of Being Earnest · Wilde',''],
+  ['명대사','flameHeart','자신을 사랑함은 평생의 로맨스예요','jasineul saranghameun pyeongsaengui romaenseuyeyo','爱自己是一生的浪漫','Ài zìjǐ shì yìshēng de làngmàn','To love oneself is a lifelong romance','An Ideal Husband · Wilde',''],
+  ['명대사','mountainStar','누군가는 별을 바라보고 있어요','nugunganeun byeoreul barabogo isseoyo','有人正仰望着星空','Yǒu rén zhèng yǎngwàngzhe xīngkōng','Some of us are looking at the stars','Lady Windermere’s Fan · Wilde',''],
+  ['부조리','moon','우린 아무것도 안 해. 그냥 너를 기다려','urin amugeotdo an hae. geunyang neoreul gidaryeo','我们什么也不做，只是等你','Wǒmen shénme yě bú zuò, zhǐshì děng nǐ','We do nothing. I just wait for you'],
+  ['부조리','subway','지하철은 오지 않아. 그래도 네 옆에서 기다릴게','jihacheoreun oji ana. geuraedo ne yeopeseo gidarilge','地铁不来了，我还是在你身边等','Dìtiě bù lái le, wǒ háishì zài nǐ shēnbiān děng','The train isn’t coming. Still, I’ll wait beside you'],
+  ['부조리','steamCup','의미는 없어. 너랑 먹는 라면만 빼고','uimineun eopseo. neorang meongneun ramyeonman ppaego','一切都没意义，除了和你吃的那碗拉面','Yíqiè dōu méi yìyì, chúle hé nǐ chī de nà wǎn lāmiàn','Nothing means anything — except the ramyeon I eat with you'],
+  ['부조리','path','우린 매일 같은 골목을 잃어버려. 손잡고 다시 잃어버리자','urin maeil gateun golmogeul ireobeoryeo. sonjapgo dasi ireobeorija','我们每天迷失在同一条巷子，牵手再迷一次吧','Wǒmen měitiān míshī zài tóng yì tiáo xiàngzi, qiānshǒu zài mí yí cì ba','We lose the same alley every day. Let’s get lost again, holding hands'],
+  ['부조리','infinity','끝나지 않는 회의처럼 널 사랑해. 이유 없이, 영원히','kkeutnaji anneun hoeuicheoreom neol saranghae. iyu eopsi, yeongwonhi','我爱你，像一场永不结束的会议——没有理由，永远','Wǒ ài nǐ, xiàng yì chǎng yǒng bù jiéshù de huìyì — méiyǒu lǐyóu, yǒngyuǎn','I love you like a meeting that never ends — for no reason, forever'],
+  ['부조리','masks','우리가 누구든 상관없어. 오늘도 같은 버스를 놓치자','uriga nugudeun sanggwaneopseo. oneuldo gateun beoseureul nochija','无论我们是谁都无所谓，今天也一起错过同一班公交吧','Wúlùn wǒmen shì shéi dōu wúsuǒwèi, jīntiān yě yìqǐ cuòguò tóng yì bān gōngjiāo ba','It doesn’t matter who we are. Let’s miss the same bus again today'],
+  ['부조리','moon','오지 않는 걸 기다리는 게 우리의 취미야','oji anneun geol gidarineun ge uriui chwimiya','等待那不会到来的，是我们的爱好','Děngdài nà bú huì dàolái de, shì wǒmen de àihào','Waiting for what never comes is our little hobby'],
+  ['부조리','masks','사실은 자루 같아 — 뭘 채워야 세워지죠','sasireun jaru gata — mwol chaewoya sewojijyo','事实就像口袋——装点东西才立得起来','Shìshí jiù xiàng kǒudài — zhuāng diǎn dōngxi cái lì de qǐlái','A fact is like a sack — it won’t stand up till you fill it','작가를 찾는 6인의 등장인물 · Pirandello',''],
+  ['고대극','flameHeart','나는 미움이 아니라 사랑을 나누려 태어났어요','naneun miumi anira sarangeul nanuryeo taeeonasseoyo','我生来是为了爱，而非恨','Wǒ shēnglái shì wèile ài, ér fēi hèn','I was born to share in love, not hatred','Antigone · Sophocles','οὔτοι συνέχθειν, ἀλλὰ συμφιλεῖν ἔφυν'],
+  ['고대극','star','사랑이여, 싸움에서 진 적 없는 이여','sarangiyeo, ssaumeseo jin jeok eomneun iyeo','爱啊，你在战斗中从未败过','Ài a, nǐ zài zhàndòu zhōng cóng wèi bài guò','Love, unconquered in battle','Antigone · Sophocles','Ἔρως ἀνίκατε μάχαν'],
+  ['고대극','column','경이로운 것 많으나, 사람보다 더 경이로운 건 없어요','gyeongiroun geot manheuna, saramboda deo gyeongiroun geon eopseoyo','奇妙之物众多，而无一比人更奇妙','Qímiào zhī wù zhòngduō, ér wú yī bǐ rén gèng qímiào','Many wonders exist, yet none more wondrous than a human','Antigone · Sophocles',''],
+  ['고대극','tearMoon','가슴 위로 고통이 한 방울씩 떨어져요','gaseum wiro gotongi han bangulssik tteoreojyeoyo','痛苦一滴一滴落在心上','Tòngkǔ yì dī yì dī luò zài xīn shàng','Drop by drop upon the heart falls the pain','Agamemnon · Aeschylus',''],
+  ['고대극','hands','진실한 벗 하나가 만 명의 혈육보다 나아요','jinsilhan beot hanaga man myeongui hyeoryukboda naayo','一个真心的朋友胜过万千血亲','Yí ge zhēnxīn de péngyou shèngguò wànqiān xuèqīn','One true friend outweighs ten thousand kin','Orestes · Euripides',''],
+
+  /* 그림자 · Shadow — honest hard feelings */
+  ['그림자','brokenHeart','상처받았어','sangcheobadasseo','我受伤了','Wǒ shòushāng le','You hurt me'],
+  ['그림자','wall','혼자 있을 시간이 필요해','honja isseul sigani piryohae','我需要一个人待一会儿','Wǒ xūyào yí ge rén dāi yíhuìr','I need some time alone'],
+  ['그림자','swordDown','질투가 나','jiltuga na','我吃醋了','Wǒ chīcù le','I feel jealous'],
+  ['그림자','spilledCup','실망했어','silmanghaesseo','我很失望','Wǒ hěn shīwàng','I am disappointed'],
+  ['그림자','cloudRain','외로워','oerowo','我很孤单','Wǒ hěn gūdān','I feel lonely'],
+  ['그림자','wall','거리가 느껴져','georiga neukkyeojyeo','我感觉我们疏远了','Wǒ gǎnjué wǒmen shūyuǎn le','I feel us drifting apart'],
+  ['그림자','hourglass','지금은 말하고 싶지 않아','jigeumeun malhago sipji ana','我现在不想说话','Wǒ xiànzài bù xiǎng shuōhuà','I can’t talk right now'],
+  ['그림자','tearMoon','무서워','museowo','我害怕','Wǒ hàipà','I’m scared'],
+
+  /* 경고 · The Omen — tarot Major Arcana warnings (warn + counsel) */
+  ['경고','tower','무너지기 전에 솔직해지자','mureojigi jeone soljikhaejija','在崩塌之前，坦白吧','Zài bēngtā zhīqián, tǎnbái ba','Be honest before it all falls','','','The Tower'],
+  ['경고','scythe','끝을 두려워 마. 변화의 시작이야','kkeuteul duryeowo ma. byeonhwaui sijagiya','别怕结束，那是改变的开始','Bié pà jiéshù, nà shì gǎibiàn de kāishǐ','Do not fear the ending; it is change','','','Death'],
+  ['경고','chain','우릴 묶는 게 사랑일까, 두려움일까?','uril mukkneun ge sarangilkka, duryeoumilkka?','捆住我们的是爱，还是恐惧？','Kǔnzhù wǒmen de shì ài, háishì kǒngjù?','Is it love that binds us, or fear?','','','The Devil'],
+  ['경고','moon','보이는 게 전부가 아니야','boineun ge jeonbuga aniya','眼见并非全部','Yǎnjiàn bìngfēi quánbù','What you see is not all there is','','','The Moon'],
+  ['경고','hourglass','멈춰 서서 다르게 바라보자','meomchwo seoseo dareuge baraboja','停下来，换个角度看','Tíng xiàlái, huàn ge jiǎodù kàn','Pause, and see it differently','','','The Hanged Man'],
+  ['경고','spilledCup','잃은 것만 보면 남은 걸 놓쳐','ireun geotman bomyeon nameun geol nochyeo','只盯着失去，会错过留下的','Zhǐ dīngzhe shīqù, huì cuòguò liúxià de','Mourn the spilled, miss what remains','','','Five of Cups'],
+  ['경고','swordDown','아픈 말은 오래 남아','apeun mareun orae nama','伤人的话会留很久','Shāngrén de huà huì liú hěn jiǔ','Sharp words linger long','','','Three of Swords'],
+];
+
+const el=id=>document.getElementById(id);
+const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const LANGS=['ko','zh','en']; const LANGLBL={ko:'한국어',zh:'中文',en:'English'};
+function toRoman(n){const m=[[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];let r='';for(const[v,s]of m){while(n>=v){r+=s;n-=v;}}return r;}
+function cardData(c,num){return{cat:c[0],sym:c[1],num,roman:toRoman(num),ko:{txt:c[2],pron:c[3]},zh:{txt:c[4],pron:c[5]},en:{txt:c[6],pron:''},source:c[7]||'',orig:c[8]||'',arc:c[9]||'',lit:LIT.includes(c[0]),omen:OMEN.includes(c[0]),id:c[2]+'|'+c[4]};}
+const CARDS=DECK.map((c,i)=>cardData(c,i+1));
+function sample(arr,n,exclude){const p=arr.filter(x=>!exclude.includes(x));const o=[];while(o.length<n&&p.length){o.push(p.splice(Math.floor(Math.random()*p.length),1)[0]);}return o;}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+const DIFFS={ '쉬움':{opt:3,time:0,hide:false,same:false,desc:'보기 3개'},
+  '보통':{opt:4,time:0,hide:false,same:false,desc:'보기 4개'},
+  '어려움':{opt:5,time:12,hide:true,same:true,desc:'보기 5개 · 그림 숨김 · 12초 · 헷갈리는 오답'} };
+
+const TUT=[
+  {g:'📱',t:'폰 하나로 함께',b:'두 사람이 폰 하나를 주고받으며 번갈아 해요. 시작 전에 각자 “먼저 읽을 언어”를 골라요.'},
+  {g:'🎭',t:'① 읽어주기',b:'카드를 뽑은 사람이 자기 언어로 소리 내어 읽어줘요. 희곡 대사는 연기하듯 읽으면 더 재밌어요.'},
+  {g:'✨',t:'② 맞히기',b:'상대는 타로 그림을 힌트 삼아, 보기 중에서 뜻을 골라요. 어려움에선 그림이 가려지고 제한시간이 생겨요.'},
+  {g:'♥',t:'③ 궁합',b:'뜻이 통할 때마다 하트 한 개! 여섯 장을 넘기면 오늘의 궁합이 나와요. 서로의 언어도 자연스럽게 배워요.'},
+];
+
+const S={ mode:'browse', primary:'ko', filter:'전체', current:null, favs:[],
+  gp:{1:'ko',2:'zh'}, diff:'보통', litOn:true, total:6,
+  round:0, speaker:1, hearts:0, gcard:null, gview:'setup', options:[], picked:null, timer:null,
+  tutStep:0, tutSeen:false };
+
+/* ---------- 저장: 설정은 이 기기, 즐겨찾기는 곰의 굴(없으면 이 기기) ---------- */
+const LC_PREFS='lovecard-prefs', LC_FAVS='lovecard-favs';
+const CODE_OK=/^(?:[A-HJ-NP-Z2-9]{8}|[A-HJ-NP-Z2-9]{16})$/;
+function lsG(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function lsS(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+const CAVE=(()=>{ const c=lsG('molly-code'); return c&&CODE_OK.test(c)?c:null; })();
+(function loadPrefs(){ try{ const p=JSON.parse(lsG(LC_PREFS)||'null'); if(!p) return;
+  if(LANGS.includes(p.primary)) S.primary=p.primary;
+  if(p.gp && LANGS.includes(p.gp[1]) && LANGS.includes(p.gp[2])) S.gp={1:p.gp[1],2:p.gp[2]};
+  if(DIFFS[p.diff]) S.diff=p.diff;
+  if(typeof p.litOn==='boolean') S.litOn=p.litOn;
+  S.tutSeen=!!p.tutSeen; }catch(e){} })();
+function savePrefs(){ lsS(LC_PREFS, JSON.stringify({primary:S.primary,gp:S.gp,diff:S.diff,litOn:S.litOn,tutSeen:S.tutSeen})); }
+function idsToCards(ids){ return (Array.isArray(ids)?ids:[]).map(id=>CARDS.find(c=>c.id===id)).filter(Boolean); }
+function saveLocalFavs(){ lsS(LC_FAVS, JSON.stringify(S.favs.map(f=>f.id))); }
+function loadLocalFavs(){ try{ S.favs=idsToCards(JSON.parse(lsG(LC_FAVS)||'[]')); }catch(e){ S.favs=[]; } }
+const SYNC_NOTE = CAVE ? '♥ 즐겨찾은 카드는 곰의 굴에 저장돼 둘이 함께 봐요' : '지금은 이 기기에만 저장돼요. 몰리에서 굴에 들어가면 둘이 함께 볼 수 있어요.';
+function setSync(msg,bad){ const s=el('sync'); if(!s) return; s.textContent=msg||''; s.className='sync'+(bad?' bad':''); }
+function applyRoomFavs(room){ S.favs=idsToCards(room&&room.favs); saveLocalFavs(); renderFavs(); if(S.current) renderCard(); }
+async function pullFavs(){ if(!CAVE) return;
+  try{ const r=await fetch('/api/room?code='+CAVE,{cache:'no-store'}); if(!r.ok) throw new Error(r.status);
+    applyRoomFavs((await r.json()).room); setSync(''); }
+  catch(e){ setSync('굴에 연결하지 못했어요. 이 기기에 저장된 카드를 보여 줘요.', true); } }
+async function pushFav(op,id){ saveLocalFavs(); if(!CAVE) return;
+  try{ const r=await fetch('/api/room',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({op,code:CAVE,id})});
+    if(!r.ok) throw new Error(r.status); applyRoomFavs((await r.json()).room); setSync(''); }
+  catch(e){ setSync('굴에 저장하지 못했어요. 인터넷 연결을 확인하고 다시 눌러 주세요.', true); } }
+
+/* browse */
+function pool(){ return CARDS.filter(c=> S.filter==='전체' || c.cat===S.filter); }
+function pick(){ const p=pool(); let c; do{ c=p[Math.floor(Math.random()*p.length)]; } while(p.length>1 && S.current && c.id===S.current.id); return c; }
+function renderCard(){ const cur=S.current; if(!cur) return; const meta=CATS[cur.cat];
+  el('numeral').textContent=cur.roman; el('suitL').textContent=meta.glyph; el('suitR').textContent=meta.glyph;
+  el('art').innerHTML=SYMBOLS[cur.sym]||SYMBOLS.star;
+  el('art').classList.toggle('omen',cur.omen); el('art').parentElement.classList.toggle('omen',cur.omen); el('card').classList.toggle('omen',cur.omen);
+  el('orig').textContent=cur.orig?'“'+cur.orig+'”':''; el('orig').style.display=cur.orig?'block':'none';
+  el('arcana').innerHTML='<span class="kcat">'+cur.cat+'</span> · '+(cur.arc||meta.arcana);
+  const order=[S.primary,...LANGS.filter(l=>l!==S.primary)];
+  el('lines').className='lines'+(cur.lit?' lit':'');
+  el('lines').innerHTML=order.map((lang,i)=>{const d=cur[lang];
+    return '<div class="line lang-'+lang+' '+(i===0?'primary':'secondary')+'"><div class="txt">'+d.txt+'</div>'+(d.pron?'<div class="pron">'+d.pron+'</div>':'')+'</div>';}).join('');
+  el('credit').textContent=cur.source?'— '+cur.source:'';
+  const f=S.favs.some(x=>x.id===cur.id); el('fav').textContent=f?'♥':'♡'; el('fav').classList.toggle('on',f); }
+function draw(){ const next=pick(); if(reduceMotion){S.current=next;renderCard();return;}
+  const card=el('card'); card.classList.add('flip'); setTimeout(()=>{S.current=next;renderCard();},155); setTimeout(()=>{card.classList.remove('flip');},175); }
+function renderFavs(){ const list=el('favList');
+  if(S.favs.length===0){list.innerHTML='<div class="empty">♡를 누른 카드가 여기 모여요</div>';return;}
+  list.innerHTML=''; S.favs.forEach((f,idx)=>{const it=document.createElement('div');it.className='fav-item';
+    it.innerHTML='<span class="fn">'+f.roman+'</span><div class="ft"><div class="a">'+f[S.primary].txt+'</div><div class="b">'+f.ko.txt+' · '+f.zh.txt+' · '+f.en.txt+'</div></div><button class="rm">삭제</button>';
+    it.addEventListener('click',e=>{if(e.target.classList.contains('rm'))return;S.current=f;renderCard();document.querySelector('.stage').scrollIntoView({behavior:'smooth',block:'center'});});
+    it.querySelector('.rm').addEventListener('click',e=>{e.stopPropagation();S.favs.splice(idx,1);renderFavs();renderCard();pushFav('favRemove',f.id);});
+    list.appendChild(it);}); }
+function toggleFav(){const i=S.favs.findIndex(f=>f.id===S.current.id);const op=i>=0?'favRemove':'favAdd';if(i>=0)S.favs.splice(i,1);else S.favs.push(S.current);renderCard();renderFavs();pushFav(op,S.current.id);}
+function buildCats(){const sel=el('cats');
+  sel.innerHTML=['전체',...Object.keys(CATS)].map(n=>'<option value="'+n+'"'+(n===S.filter?' selected':'')+'>'+(n==='전체'?'모든 카드':n)+'</option>').join('');
+  sel.addEventListener('change',()=>{S.filter=sel.value;draw();}); }
+
+/* tutorial */
+function openTut(i){ S.tutStep=i; el('tut').classList.remove('hidden'); renderTut(); }
+function closeTut(){ el('tut').classList.add('hidden'); }
+function renderTut(){ const s=TUT[S.tutStep];
+  el('tutGlyph').textContent=s.g; el('tutTitle').textContent=s.t; el('tutBody').textContent=s.b;
+  el('tutDots').innerHTML=TUT.map((_,i)=>'<i class="'+(i===S.tutStep?'on':'')+'"></i>').join('');
+  el('tutNext').textContent = S.tutStep>=TUT.length-1 ? '시작하기' : '다음';
+  el('tutSkip').style.visibility = S.tutStep>=TUT.length-1 ? 'hidden' : 'visible'; }
+el('tutNext').addEventListener('click',()=>{ if(S.tutStep>=TUT.length-1) closeTut(); else openTut(S.tutStep+1); });
+el('tutSkip').addEventListener('click',closeTut);
+
+/* game */
+function gamePool(){ const cats=S.litOn?EVERYDAY.concat(LIT):EVERYDAY; return CARDS.filter(c=>cats.includes(c.cat)); }
+function listenerLang(){ return S.gp[S.speaker===1?2:1]; }
+function speakerLang(){ return S.gp[S.speaker]; }
+function clearTimer(){ if(S.timer){clearInterval(S.timer);S.timer=null;} }
+function heartsRow(big){ let h=''; for(let i=0;i<S.total;i++) h+=(i<S.hearts?'♥':'<span class="off">♡</span>'); return '<div class="hearts'+(big?' big':'')+'">'+h+'</div>'; }
+function pickGameCard(){ const p=gamePool(); let c; do{ c=p[Math.floor(Math.random()*p.length)]; } while(S.gcard && c.id===S.gcard.id); return c; }
+function startGame(){ S.round=0; S.hearts=0; S.speaker=1; S.gcard=null; nextRound(); }
+function nextRound(){ const d=DIFFS[S.diff]; S.gcard=pickGameCard(); const ll=listenerLang(); const correct=S.gcard[ll].txt;
+  let distract=[]; const p=gamePool();
+  if(d.same){ distract=sample(p.filter(c=>c.cat===S.gcard.cat),d.opt-1,[S.gcard]).map(c=>c[ll].txt); }
+  if(distract.length<d.opt-1){ const more=sample(p,d.opt-1-distract.length,[S.gcard]).map(c=>c[ll].txt).filter(t=>t!==correct&&!distract.includes(t)); distract=distract.concat(more); }
+  S.options=shuffle([{txt:correct,ok:true},...distract.slice(0,d.opt-1).map(t=>({txt:t,ok:false}))]);
+  S.gview='speak'; renderGame(); }
+function answer(i){ clearTimer(); S.picked=i; if(i>=0 && S.options[i].ok) S.hearts++; S.gview='reveal'; renderGame(); }
+function startTimerUI(sec){ const num=el('tnum'),fill=el('tfill'); let left=sec;
+  if(fill){ fill.style.transition='none'; fill.style.width='100%'; requestAnimationFrame(()=>{ fill.style.transition='width '+sec+'s linear'; fill.style.width='0%'; }); }
+  S.timer=setInterval(()=>{ left--; if(num)num.textContent=Math.max(0,left); if(left<=0){ clearTimer(); answer(-1);} },1000); }
+
+function diffSeg(){ return '<div class="g-seg" id="diffSeg">'+Object.keys(DIFFS).map(k=>'<button data-d="'+k+'" aria-pressed="'+(S.diff===k)+'">'+k+'</button>').join('')+'</div><div class="g-diffnote" id="diffNote">'+DIFFS[S.diff].desc+'</div>'; }
+function langRow(who){ return '<div class="g-langrow"><span>'+who+'번 · Player '+who+'</span><div class="g-seg" data-who="'+who+'">'+LANGS.map(l=>'<button data-lang="'+l+'" aria-pressed="'+(S.gp[who]===l)+'">'+(l==='ko'?'한':l==='zh'?'中':'EN')+'</button>').join('')+'</div></div>'; }
+
+function renderGame(){ clearTimer(); const st=el('gameStage'); const d=DIFFS[S.diff];
+  if(S.gview==='setup'){
+    st.innerHTML='<div class="g-panel panel">'+
+      '<div class="g-title">둘의 언어를 골라요</div>'+
+      langRow(1)+'<div class="g-vs">♥</div>'+langRow(2)+
+      '<div class="g-sec">난이도</div>'+diffSeg()+
+      '<button class="g-toggle" id="litTog" aria-pressed="'+S.litOn+'"><span class="box">'+(S.litOn?'✓':'')+'</span> 고전·문학·경고 카드 포함</button>'+
+      '<button class="g-btn" id="gStart">게임 시작</button>'+
+      '<button class="g-link" id="tutOpen">＋ 게임 방법 다시 보기</button>'+
+    '</div>';
+    st.querySelectorAll('.g-seg[data-who]').forEach(seg=>seg.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.gp[seg.dataset.who]=b.dataset.lang;[...seg.children].forEach(x=>x.setAttribute('aria-pressed',x===b));savePrefs();}));
+    el('diffSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.diff=b.dataset.d;[...el('diffSeg').children].forEach(x=>x.setAttribute('aria-pressed',x===b));el('diffNote').textContent=DIFFS[S.diff].desc;savePrefs();});
+    el('litTog').addEventListener('click',()=>{S.litOn=!S.litOn;el('litTog').setAttribute('aria-pressed',S.litOn);el('litTog').querySelector('.box').textContent=S.litOn?'✓':'';savePrefs();});
+    el('gStart').addEventListener('click',startGame);
+    el('tutOpen').addEventListener('click',()=>openTut(0));
+    el('foot').textContent='둘이 폰 하나를 주고받으며 즐겨요'; return;
+  }
+  if(S.gview==='speak'){ const sl=speakerLang(); const dd=S.gcard[sl]; const meta=CATS[S.gcard.cat]; const om=S.gcard.omen?' omen':'';
+    st.innerHTML='<div class="g-turnbar"><b>'+S.speaker+'번</b> · '+LANGLBL[sl]+'(으)로 읽어주세요</div>'+
+      '<div class="panel'+om+'" style="width:100%;padding:14px 14px 16px;">'+
+        '<div class="card-top"><span class="suit">'+meta.glyph+'</span><span class="numeral">'+S.gcard.roman+'</span><span class="suit">'+meta.glyph+'</span></div>'+
+        '<div class="art-frame sm'+om+'"><svg class="art'+om+'" viewBox="0 0 100 100">'+(SYMBOLS[S.gcard.sym]||SYMBOLS.star)+'</svg></div>'+
+        '<div class="arcana"><span class="kcat">'+S.gcard.cat+'</span> · '+(S.gcard.arc||meta.arcana)+'</div>'+
+        (S.gcard.orig?'<div class="orig">“'+S.gcard.orig+'”</div>':'')+
+        '<div class="speak-line lang-'+sl+(S.gcard.lit?' lit':'')+'"><div class="txt">'+dd.txt+'</div>'+(dd.pron?'<div class="pron">'+dd.pron+'</div>':'')+'</div>'+
+        '<div class="speak-hint">상대에게 소리 내어 읽어주세요 🎭</div>'+
+        (S.gcard.source?'<div class="credit">— '+S.gcard.source+'</div>':'')+
+      '</div>'+
+      '<button class="g-btn" id="gToGuess">상대가 맞힐 차례 →</button>'+heartsRow();
+    el('gToGuess').addEventListener('click',()=>{S.gview='guess';renderGame();});
+    el('foot').textContent='라운드 '+(S.round+1)+' / '+S.total+' · '+S.diff; return;
+  }
+  if(S.gview==='guess'){ const ll=listenerLang(); const other=S.speaker===1?2:1; const om=S.gcard.omen?' omen':'';
+    const art = d.hide ? '<div class="back-q">?</div>' : '<svg class="art'+om+'" viewBox="0 0 100 100">'+(SYMBOLS[S.gcard.sym]||SYMBOLS.star)+'</svg>';
+    st.innerHTML='<div class="g-turnbar"><b>'+other+'번</b> · 무슨 뜻일까요?</div>'+
+      '<div class="panel" style="width:100%;padding:12px;"><div class="art-frame sm'+(d.hide?'':om)+'" style="margin:2px auto;">'+art+'</div></div>'+
+      (d.time>0?'<div class="timer-wrap"><div class="tbar"><div class="tfill" id="tfill"></div></div><div class="tnum">⏳ <span id="tnum">'+d.time+'</span></div></div>':'')+
+      '<div class="g-options" id="gOpts">'+S.options.map((o,i)=>'<button class="g-opt '+ll+'" data-i="'+i+'">'+o.txt+'</button>').join('')+'</div>'+heartsRow();
+    el('gOpts').querySelectorAll('.g-opt').forEach(b=>b.addEventListener('click',()=>answer(+b.dataset.i)));
+    if(d.time>0) startTimerUI(d.time);
+    el('foot').textContent='라운드 '+(S.round+1)+' / '+S.total+' · '+S.diff; return;
+  }
+  if(S.gview==='reveal'){ const good=S.picked>=0 && S.options[S.picked].ok; let cls,msg;
+    if(S.picked<0){cls='no';msg='시간 초과! 이런 뜻이었어요';} else if(good){cls='ok';msg='마음이 통했어요! ♥';} else {cls='no';msg='아쉬워요, 이런 뜻이었어요';}
+    const om=S.gcard.omen?' omen':''; const meta=CATS[S.gcard.cat];
+    st.innerHTML='<div class="g-turnbar '+cls+'">'+msg+'</div>'+
+      '<div class="panel'+om+'" style="width:100%;padding:14px;">'+
+        '<div class="art-frame sm'+om+'" style="margin:2px auto 8px;"><svg class="art'+om+'" viewBox="0 0 100 100">'+(SYMBOLS[S.gcard.sym]||SYMBOLS.star)+'</svg></div>'+
+        '<div class="arcana"><span class="kcat">'+S.gcard.cat+'</span> · '+(S.gcard.arc||meta.arcana)+'</div>'+
+        (S.gcard.orig?'<div class="orig">“'+S.gcard.orig+'”</div>':'')+
+        ['ko','zh','en'].map(l=>'<div class="line lang-'+l+' secondary" style="padding:3px;"><div class="txt" style="font-size:15px;">'+S.gcard[l].txt+'</div></div>').join('')+
+        (S.gcard.source?'<div class="credit">— '+S.gcard.source+'</div>':'')+
+      '</div>'+
+      '<button class="g-btn" id="gNext">'+(S.round+1>=S.total?'오늘의 궁합 보기 ✦':'다음 카드 →')+'</button>'+heartsRow();
+    el('gNext').addEventListener('click',()=>{ S.round++; if(S.round>=S.total){S.gview='result';renderGame();} else {S.speaker=S.speaker===1?2:1;nextRound();} }); return;
+  }
+  if(S.gview==='result'){ const h=S.hearts,t=S.total; let title,en,sub;
+    if(h>=t){title='운명의 짝';en='Soulmates';sub='말이 필요 없는 사이. 완벽하게 통했어요.';}
+    else if(h>=t-2){title='천생연분';en='Meant to be';sub='마음이 거의 다 통해요. 조금만 더 알아가요.';}
+    else if(h>=2){title='알아가는 중';en='Getting closer';sub='서로의 언어를 배우는 즐거움이 있네요.';}
+    else{title='이제 시작';en='Just beginning';sub='괜찮아요, 함께 배우면 금방 통할 거예요.';}
+    st.innerHTML='<div class="g-panel panel"><div class="r-title">'+title+'</div><div class="r-en">'+en+' · '+S.diff+'</div>'+heartsRow(true)+
+      '<div class="r-score">'+t+'장 중 '+h+'번 마음이 통했어요</div><div class="r-sub">'+sub+'</div></div>'+
+      '<button class="g-btn" id="gAgain">다시 하기</button><button class="g-btn ghost" id="gSetup">설정 다시 고르기</button>';
+    el('gAgain').addEventListener('click',startGame); el('gSetup').addEventListener('click',()=>{S.gview='setup';renderGame();});
+    el('foot').textContent='궁합은 재미로 즐겨요 ✦'; return;
+  }
+}
+
+function setMode(m){ clearTimer(); S.mode=m;
+  [...el('modebar').children].forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===m));
+  el('browseView').classList.toggle('hidden',m!=='browse'); el('gameView').classList.toggle('hidden',m!=='game');
+  if(m==='game'){ if(S.round===0&&S.gview!=='setup')S.gview='setup'; renderGame(); if(!S.tutSeen){S.tutSeen=true; savePrefs(); openTut(0);} }
+  else el('foot').textContent=''; }
+el('modebar').addEventListener('click',e=>{const b=e.target.closest('button');if(b)setMode(b.dataset.mode);});
+el('segment').addEventListener('click',e=>{const btn=e.target.closest('button');if(!btn)return;S.primary=btn.dataset.lang;[...el('segment').children].forEach(b=>b.setAttribute('aria-pressed',b===btn));savePrefs();renderCard();renderFavs();});
+el('card').addEventListener('click',e=>{if(e.target.id==='fav')return;draw();});
+el('card').addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();draw();}});
+el('fav').addEventListener('click',e=>{e.stopPropagation();toggleFav();});
+[...el('segment').children].forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===S.primary));
+loadLocalFavs(); buildCats(); S.current=pick(); renderCard(); renderFavs(); setSync('');
+pullFavs();
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden && S.mode==='browse') pullFavs(); });
+setInterval(()=>{ if(!document.hidden && S.mode==='browse') pullFavs(); }, 20000);
+</script>
+</body>
+</html>
